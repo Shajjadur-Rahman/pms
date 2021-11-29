@@ -1,0 +1,121 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title_block %} Project detail {% endblock %}
+{% block content_block %}
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Project Detail</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <!-- Default box -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+              <i class="fas fa-minus"></i></button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+              <i class="fas fa-times"></i></button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <div class="row">
+            <div class="col-12 col-md-12 col-lg-8 order-2 order-md-1">
+
+              <div class="row">
+                  <div class="col-12 col-md-12">
+                    <div class="">
+                         {% load tz %}
+                      <h3><span class="text-info">Project name :</span> {{ project.title }}</h3>
+                      <h4><span class="text-info">Project Start :</span> {{ project.approve_status }}</h4>
+                      <h4><span class="text-info">Project Leader :</span> {% if project.project_leader %}{{ project.project_leader }} assigned as Co-manager {% else %} Not added ! {% endif %}</h4>
+                        <small><span class="text-info">Created on :</span> {{ project.created_at|timezone:local_tz }}</small>
+                      <p class="mt-4"><span class="text-info">Description : </span>{{ project.description }}</p>
+                          <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1" {% if project.public %}checked{% endif %}>
+                            <label class="form-check-label" for="inlineCheckbox1">Public</label>
+                          </div>
+                    </div>
+                  </div>
+              </div>
+            </div>
+            <div class="col-12 col-md-12 col-lg-4 order-1 order-md-2" style="border-left: 1px solid #ddd;">
+              <h5 class="text-primary mb-4 px-4"><i class="fas fa-users"></i> Crew list</h5>
+              <div class="row">
+                  {% for user in project.confirm_members.all %}
+                  <div class="col-12 my-2 px-4">
+                     <div class="user-block">
+                     {% if user.profile.profile_image %}
+                      <img class="img-circle img-bordered-sm" src="{{ user.profile.profile_image.url }}" alt="{{ user }}">
+                     {% else %}
+                      <img class="img-circle img-bordered-sm" src="{% static 'static_images/img/user1-128x128.jpg' %}" alt="{{ user }}">
+                     {% endif %}
+                      <span class="username">
+                        <a href="#" class="d-block pt-2">{{ user }}</a>
+                      </span>
+                    </div>
+                  </div>
+                  {% empty %}
+                   <div class="col-12">
+                    <div class="user-block">
+                        <h6 class="text-danger pl-4">Crew doesn't exists for this project !</h6>
+                    </div>
+                   </div>
+                  {% endfor %}
+              </div>
+              <hr/>
+              <h5 class="text-primary mb-4 mt-4 px-4"><i class="fas fa-users"></i> Proposal sent </h5>
+              <div class="row">
+                  {% for user in project.members.all %}
+                  <div class="col-12 my-2 px-4">
+                     <div class="user-block">
+                     {% if user.profile.profile_image %}
+                      <img class="img-circle img-bordered-sm" src="{{ user.profile.profile_image.url }}" alt="{{ user }}">
+                     {% else %}
+                      <img class="img-circle img-bordered-sm" src="{% static 'static_images/img/user1-128x128.jpg' %}" alt="{{ user }}">
+                     {% endif %}
+                      <span class="username">
+                        <a href="#" class="d-block pt-2">{{ user }}</a>
+                      </span>
+                    </div>
+                  </div>
+                  {% empty %}
+                   <div class="col-12">
+                    <div class="user-block">
+                      <h6 class="text-danger pl-4">Proposal sending request doesn't exists !</h6>
+                    </div>
+                   </div>
+                  {% endfor %}
+
+              </div>
+              <div class="mt-5 mb-3 px-4">
+                <a href="{% url 'dashboard:projects-list' %}" class="btn btn-sm btn-primary">Back</a>
+                <a href="{% url 'account:create-member' %}" class="btn btn-sm btn-warning">Add Member</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{% endblock %}

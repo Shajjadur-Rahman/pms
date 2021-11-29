@@ -1,0 +1,134 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title_block %} {% if user.username %}{{ user.username }}'s {% else %} {{ user.email }} {% endif %} profile {% endblock %}
+{% block content_block %}
+  <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <section class="content-header">
+              <div class="container-fluid">
+                <div class="row mb-2">
+                  <div class="col-sm-6">
+                    <h1>Profile</h1>
+                  </div>
+                  <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                      <li class="breadcrumb-item"><a href="#">Home</a></li>
+                      <li class="breadcrumb-item active">User Profile</li>
+                    </ol>
+                  </div>
+                </div>
+              </div><!-- /.container-fluid -->
+            </section>
+          <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+          <div class="row">
+              <div class="col-md-3">
+                  <!-- Profile Image -->
+                    <div class="card card-primary card-outline">
+                      <div class="card-body box-profile">
+                        <div class="text-center">
+                            <a href="#" title="Click to update image">
+                                {% if user.profile.profile_image %}
+                              <img class="profile-user-img img-fluid img-circle"
+                                   style="width: 130px; height: 130px"
+                                   src="{{ user.profile.profile_image.url }}"
+                                   alt="{% if user.username %}{{ user.username }}{% else %}{{ user.email }}{% endif %}">
+                              {% else %}
+                              <img class="profile-user-img img-fluid img-circle"
+                                   src="{% static 'static_images/img/user1-128x128.jpg' %}"
+                                   alt="{% if user.username %}{{ user.username }}{% else %}{{ user.email }}{% endif %}">
+                              {% endif %}
+                             </a>
+                        </div>
+                            <h3 class="profile-username text-center">{% if user.username %}{{ user.username|capfirst }}{% else %}{{ user.email }}{% endif %}</h3>
+                            <p class="text-muted text-center">{{ user.user_type }}</p>
+
+                            <ul class="list-group list-group-unbordered mb-3">
+                              <li class="list-group-item">
+                                <b>Project incoming request</b> <a class="float-right"></a>
+                              </li>
+                              <li class="list-group-item">
+                                <b>Username</b> <a class="float-right">{% if user.username %}{{ user.username }}{% else %} Null {% endif %}</a>
+                              </li>
+                              <li class="list-group-item">
+                                <b>Email</b> <a class="float-right">{{ user.email }}</a>
+                              </li>
+                              <li class="list-group-item">
+                                <b>Phone no</b> <a class="float-right">{% if user.profile.phone_no %}{{ user.profile.phone_no }} {% else %} Null {% endif %}</a>
+                              </li>
+                              <li class="list-group-item">
+                                <b>Gender</b> <a class="float-right">{{ user.profile.gender }}</a>
+                              </li>
+                              <li class="list-group-item">
+                                <b>Profile created by</b> <a class="float-right">{{ user.profile.invited_by }}</a>
+                              </li>
+                              <li class="list-group-item">
+                                {% load tz %}
+                                <b>Profile created on</b> <a class="float-right">{{ user.profile.timestamp|timezone:local_tz }}</a>
+                              </li>
+                            </ul>
+                      </div> <!-- /.card -->
+                    </div>
+              </div>
+
+            <!-- /.col -->
+              <div class="col-md-9">
+                <div class="card">
+                <div class="card-header mb-4">
+                    <div class="d-flex justify-content-between">
+                        <h2>{% if user.username %}{{ user.username }}'s {% else %} {{ user.email }}{% endif %} projects</h2> <h2 class="mr-4" style="padding-right: 50px;">Member / Contact</h2>
+                    </div>
+                </div>
+                  <div class="card-body">
+                      <div class="row">
+
+                          <div class="col-md-12">
+                                <!-- Post -->
+                                 {% for project in projects %}
+                                <div class="post d-flex align-items-center justify-content-center">
+                                    <div class="post__left" style="width: 70%">
+                                        <h3><span class="text-info">Project name </span> : {{ project.title }} <small>( Crew {{ project.confirm_members.all.count }} )</small></h3>
+                                        {% load tz %}
+                                        <h5><span class="text-info">Shared publicly </span> : - {{ project.public_shared|timezone:local_tz }}</h5>
+                                        <p><span class="text-info">Project description </span> : {{ project.sliced_description }}</p>
+                                        <a href="{% url 'dashboard:project-detail' pk=project.id %}" class="btn btn-sm btn-primary text-white" style="cursor: pointer"><i class="fas fa-folder"></i> View</a>
+                                    </div>
+                                    <div class="post__right pl-4 ml-4" style="width: 30%">
+                                        {% for project_user in project.confirm_members.all %}
+                                        <div class="user-block">
+                                         {% if project_user.profile.profile_image %}
+                                          <img class="img-circle img-bordered-sm" src="{{ project_user.profile.profile_image.url }}" alt="{{ project_user.username }}">
+                                         {% else %}
+                                          <img class="img-circle img-bordered-sm" src="{% static 'static_images/img/user1-128x128.jpg' %}" alt="{{ project_user.username }}">
+                                         {% endif %}
+                                        <span class="username">
+                                          <a href="#" class="d-block pt-2">{{ project_user.username }}</a>
+                                        </span>
+                                    </div>
+                                    {% empty %}
+                                      <div class="user-block">
+                                          <h6 class="text-danger pl-4">Crew doesn't exists for this project !</h6>
+                                      </div>
+                                    {% endfor %}
+                                    </div>
+                                </div>
+                                 {% empty %}
+                               <div class="post">
+                                   No fount !
+                               </div>
+                                 {% endfor %}
+                                <!-- /.post -->
+                          </div>
+                      </div>
+                  </div><!-- /.card-body -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+              </div>
+              <!-- /.col -->
+
+          </div>
+      </div>
+    </section>
+  </div>
+{% endblock %}

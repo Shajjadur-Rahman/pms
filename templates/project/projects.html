@@ -1,0 +1,285 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title_block %} Projects list {% endblock %}
+{% block content_block %}
+
+
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <div class="container-fluid">
+        <div class="row mb-2">
+          <div class="col-sm-6">
+            <h1> {% if approve_status == 'Approve' and completed %} Completed Projects {% elif approve_status == 'Pending' %} {{ approve_status }} Projects {% elif approve_status == 'Approve' %} Approved Projects {% else %} Projects {% endif %}  </h1>
+          </div>
+          <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li class="breadcrumb-item active">Projects</li>
+            </ol>
+          </div>
+        </div>
+      </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+                    {% if messages %}
+                    {% for message in messages %}
+                    <div {% if message.tags %} class="alert alert-{{ message.tags }} {% endif %}" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+      <!-- Default box -->
+      <div class="card">
+        <div class="card-header">
+
+             <div id="delete_msg_wrapper" class="alert alert-warning d-none" role="alert">
+                 <span id="delete_msg"></span>
+                 <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+             </div>
+
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+              <i class="fas fa-minus"></i></button>
+            <button type="button" class="btn btn-tool" data-card-widget="remove" data-toggle="tooltip" title="Remove">
+              <i class="fas fa-times"></i></button>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped projects">
+              <thead>
+                  <tr class="text-center">
+                      <th style="width: 1%">
+                          #
+                      </th>
+                      <th>
+                          Project Name
+                      </th>
+                      <th>
+                          Team Members
+                      </th>
+                       <th>
+                          Approve
+                      </th>
+                       <th>
+                          Public
+                      </th>
+                      <th style="width: 19%," class="text-right">
+                          <a href="{% url 'dashboard:project-add' %}" class="btn btn-sm btn-primary text-white" > <i class="fas fa-plus"></i> Add project</a>
+                      </th>
+                  </tr>
+              </thead>
+              <tbody>
+              {% for project in projects %}
+                  <tr class="text-center" id="project_tr{{project.id}}">
+                      <td>
+                          {{ forloop.counter }}
+                      </td>
+                      <td>
+                          <a>
+                              {{ project.title }}
+                          </a>
+                          <br/>
+                          <small>
+                                {% load tz %}
+                                {{ project.created_at|timezone:local_tz }} // {{ project.start_time|timezone:local_tz }}
+
+                          </small>
+                      </td>
+                      <td>
+                          <ul class="list-inline">
+                          {% for user in project.confirm_members.all %}
+                              <li class="list-inline-item">
+                                  {% if user.profile.profile_image %}
+                                  <img alt="{{ user }}" title="{{ user }}" class="table-avatar" style="width:50px; height:50px" src="{{ user.profile.profile_image.url }}">
+                                  {% else %}
+                                  <img alt="{{ user }}" title="{{ user }}" class="table-avatar" style="width:50px; height:50px" src="{% static 'static_images/img/user1-128x128.jpg' %}">
+                                  {% endif %}
+
+                              </li>
+                          {% empty %}
+                               <li class="list-inline-item text-center text-danger">
+                                  Members haven't accepted proposal for this project yet !
+                                  <h6 class="text-primary">Proposal sent to {{ project.members.all.count }} {% if project.members.all.count == 1 %}Member / Contact{% else %}Members / Contacts{% endif %}</h6>
+                              </li>
+                          {% endfor %}
+                          </ul>
+                      </td>
+                      <td>
+                          {% if request.user.user_type == 'Admin' %}
+                          <button onclick=approve({{project.id}}) id="status__btn{{project.id}}" class="btn btn-sm btn-{% if project.approve_status == 'Approve' %}success{% else %}warning{% endif %}">{{ project.approve_status }}</button>
+                          {% else %}
+                          <button class="btn btn-sm btn-{% if project.approve_status == 'Approve' %}success{% else %}warning{% endif %}">{{ project.approve_status }}</button>
+                          {% endif %}
+                      </td>
+                      <td>{% if project.public %} <span class="badge badge-info p-2">Yes</span> {% else %} <span class="badge badge-danger">No</span> {% endif %}</td>
+
+                      <td class="project-actions text-right">
+
+                          {% if approve_status == 'Approve' or request.user.user_type == 'Admin' %}
+                          <a class="btn btn-info btn-sm" title="Click to add project start and complete datetime" href="{% url 'dashboard:add-project-date-role' title=project.title pk=project.id %}">
+                              <i class="fas fa-plus">
+                              </i>
+                              Date
+                          </a>
+                          {% elif request.user.user_type == 'Manager' and project.approve_status == 'Pending' %}
+                          <a class="btn btn-info btn-sm" title="Click to add project start and complete datetime" href="{% url 'dashboard:add-project-date-role' title=project.title pk=project.id %}">
+                              <i class="fas fa-plus">
+                              </i>
+                              Date
+                          </a>
+                          {% else %}
+                          <button class="btn btn-info btn-sm" disabled>
+                              <i class="fas fa-plus">
+                              </i>
+                              Date
+                          </button>
+                          {% endif %}
+
+                          <a class="btn btn-primary btn-sm" href="{% url 'dashboard:project-detail' pk=project.id %}">
+                              <i class="fas fa-folder">
+                              </i>
+                              View
+                          </a>
+
+                           {% if approve_status == 'Approve' or request.user.user_type == 'Admin' %}
+                          <a class="btn btn-info btn-sm" href="{% url 'dashboard:project-update' pk=project.id %}">
+                              <i class="fas fa-pencil-alt">
+                              </i>
+                              Edit
+                          </a>
+                          {% elif request.user.user_type == 'Manager' and project.approve_status == 'Pending' %}
+                          <a class="btn btn-info btn-sm" href="{% url 'dashboard:project-update' pk=project.id %}">
+                              <i class="fas fa-pencil-alt">
+                              </i>
+                              Edit
+                          </a>
+                          {% else %}
+                          <button class="btn btn-info btn-sm" disabled>
+                              <i class="fas fa-pencil-alt">
+                              </i>
+                              Edit
+                          </button>
+                          {% endif %}
+
+
+                          {% if approve_status == 'Approve' or request.user.user_type == 'Admin' %}
+                          <button class="btn btn-danger btn-sm" onclick=deleteProject({{project.id}})>
+                              <i class="fas fa-trash">
+                              </i>
+                              Delete
+                          </button>
+                          {% elif request.user.user_type == 'Manager' and project.approve_status == 'Pending' %}
+                          <button class="btn btn-danger btn-sm" onclick=deleteProject({{project.id}})>
+                              <i class="fas fa-trash">
+                              </i>
+                              Delete
+                          </button>
+                          {% else %}
+                          <button class="btn btn-danger btn-sm" disabled>
+                              <i class="fas fa-trash">
+                              </i>
+                              Delete
+                          </button>
+                          {% endif %}
+                      </td>
+                  </tr>
+              {% empty %}
+                  <tr>
+                      <td class="text-center text-danger" colspan="6">
+                          {% if approve_status == 'Approve' and completed %} Completed Project not fount ! {% elif approve_status == 'Pending' %} {{ approve_status }} Project not fount ! {% else %} Project not fount ! {% endif %}
+                      </td>
+                  </tr>
+              {% endfor %}
+
+              </tbody>
+          </table>
+        </div>
+        <!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+{% endblock %}
+
+{% block js_block %}
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function approve(id) {
+    var stat__btn = document.getElementById(`status__btn${id}`)
+        stat__btn.style.color = "white";
+
+        var url = `http://127.0.0.1:8000/project-approve/${id}/`
+        fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrftoken
+        }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+            stat__btn.innerHTML = response.approve_status
+            stat__btn.classList.remove('btn', 'btn-sm', 'btn-warning')
+            stat__btn.classList.add('btn', 'btn-sm', 'btn-success')
+        })
+
+};
+
+
+function deleteProject(id) {
+        event.preventDefault()
+        var delete_msg = document.getElementById("delete_msg")
+        var delete_msg_wrapper = document.getElementById("delete_msg_wrapper")
+        var url = `http://127.0.0.1:8000/project-delete/${id}/`
+       fetch(url, {
+        method: 'POST',
+       headers: {
+           'Content-type': 'application/json',
+          'X-CSRFToken': csrftoken
+        }
+        })
+       .then((response) => response.json())
+       .then((response) => {
+           document.getElementById(`project_tr${id}`).remove()
+           delete_msg_wrapper.classList.remove('alert', 'alert-warning', 'd-none')
+           delete_msg_wrapper.classList.add('alert', 'alert-warning')
+           delete_msg.innerHTML = response.success
+        })
+
+};
+
+
+</script>
+{% endblock %}
+
+<!--    $(document).ready(function(){-->
+<!--    $('#status__btn').click(function(){-->
+<!--        alert(id)-->
+<!--    })-->
+<!--})-->

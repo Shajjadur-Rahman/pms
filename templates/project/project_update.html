@@ -1,0 +1,94 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title_block %} Project update {% endblock %}
+{% block content_block %}
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+            <section class="content-header">
+              <div class="container-fluid">
+                <div class="row mb-2">
+                  <div class="col-sm-6">
+                  </div>
+                  <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                      <li class="breadcrumb-item"><a href="#">Home</a></li>
+                      <li class="breadcrumb-item active">Project</li>
+                      <li class="breadcrumb-item active">Update</li>
+                    </ol>
+                  </div>
+                </div>
+              </div><!-- /.container-fluid -->
+            </section>
+
+    <!-- Main content -->
+    <section class="content">
+      <form action="" method="POST">{% csrf_token %}
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Updating  <i class="fas fa-hand-point-right"></i> &nbsp; &nbsp;{{ project.title }}</h3>
+              <div class="card-tools">
+                <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
+                  <i class="fas fa-minus"></i></button>
+              </div>
+            </div>
+            		{% if messages %}
+                    {% for message in messages %}
+                    <div {% if message.tags %} class="alert alert-{{ message.tags }} {% endif %}" role="alert">
+                        {{ message }}  &nbsp; &nbsp; <a class="text-primary" href="{% url 'dashboard:projects-list' %}">View all available Projects</a>
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+            <div class="d-flex">
+              <div class="card-body">
+              <div class="form-group">
+                <label for="inputName">Project name / title *</label>
+               {{ form.title }}
+              </div>
+              <div class="form-group">
+                <label for="inputDescription">Project Description *</label>
+                {{ form.description }}
+              </div>
+              <div class="form-group">
+                <label for="inputStatus">Project leader</label>
+                 {{ form.project_leader }}
+              </div>
+
+              <div class="form-group">
+                  <div class="form-check">
+                    {{ form.public }}
+                    <label class="form-check-label" for="exampleCheck1">Public</label>
+                  </div>
+              </div>
+
+            </div>
+             <div class="mt-4 overflow-auto" style="min-width: 20%; height: 400px">
+               <label for="inputStatus" style="position: fixed; background: #fff; padding: 10px 80px; z-index: 100; text-align: left">Update crew</label>
+               <div style="margin-top: 60px">
+                  <div class="form-group">
+                      <div class="form-check">
+                        {{ form.members }}
+                      </div>
+                  </div>
+             </div>
+             </div>
+            </div>
+            <!-- /.card-body -->
+
+          </div>
+          <!-- /.card -->
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <input type="reset" value="Reset" class="btn btn-secondary">
+          <input type="submit" value="Create new Porject" class="btn btn-success">
+        </div>
+      </div>
+         </form>
+    </section>
+    <!-- /.content -->
+  </div>
+{% endblock %}
