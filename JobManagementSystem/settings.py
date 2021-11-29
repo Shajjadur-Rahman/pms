@@ -16,7 +16,7 @@ SECRET_KEY = 'django-insecure-phys6#ls4s4k3td_n10ct%e=o+y!o*$u^9sfdi^-vnqwf$_-f-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['shajjadpms.herokuapp.com']
+ALLOWED_HOSTS = ['shajjadpms.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
@@ -122,7 +122,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
