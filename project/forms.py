@@ -15,6 +15,16 @@ class ProjectRoleForm(forms.ModelForm):
         fields = ['role_title', ]
 
 
+class AddCrewInRoleForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(AddCrewInRoleForm, self).__init__(*args, **kwargs)
+        self.fields['member'].widget.attrs.update({'class': 'form-control'})
+
+    class Meta:
+        model  = Role
+        fields = ['member', ]
+
+
 
 
 class ProjectForm(forms.ModelForm):

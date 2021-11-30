@@ -14,11 +14,11 @@ MEDIA_DIR = BASE_DIR / 'media'
 SECRET_KEY = 'django-insecure-phys6#ls4s4k3td_n10ct%e=o+y!o*$u^9sfdi^-vnqwf$_-f-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = True
+# DEBUG = False
 
-ALLOWED_HOSTS = ['shajjadpms.herokuapp.com', '127.0.0.1']
-# ALLOWED_HOSTS = ["*"]
+# ALLOWED_HOSTS = ['shajjadpms.herokuapp.com', '127.0.0.1']
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -41,7 +41,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    'whitenoise.middleware.WhiteNoiseMiddleware', # http://whitenoise.evans.io/en/stable/
+    # 'whitenoise.middleware.WhiteNoiseMiddleware', # http://whitenoise.evans.io/en/stable/
 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -131,7 +131,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
    STATIC_DIR,
 ]
-STATIC_ROOT=BASE_DIR/'assets'
+# STATIC_ROOT=BASE_DIR/'assets'
 
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'

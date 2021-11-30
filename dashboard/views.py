@@ -10,7 +10,7 @@ from account.models import User
 from datetime import datetime
 from tzlocal import get_localzone
 from account.permission import PermissionForAllUser, AdminAndManagerPermission
-from project.forms import ProjectForm, ProjectCreateForm, ProjectUpdateForm, ProjectRoleForm
+from project.forms import ProjectForm, ProjectCreateForm, ProjectUpdateForm, ProjectRoleForm, AddCrewInRoleForm
 from django.views.generic import (
     View,
     ListView,
@@ -164,13 +164,12 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
         except:
             project = None
         role_form = ProjectRoleForm()
-        # roles     = Role.objects.all()
         if project.start_time and project.end_time:
             return render(self.request, 'project/add_project_date_and_role.html',
                           context={'role_form': role_form, 'title': title,  'datetime_add': False, 'project': project})
         else:
             return render(self.request, 'project/add_project_date_and_role.html',
-                          context={'role_form': role_form, 'title': title, 'datetime_add': False, 'project': project})
+                          context={'role_form': role_form, 'title': title, 'datetime_add': True, 'project': project})
 
 
     def post(self, *args, **kwargs):
@@ -180,7 +179,10 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
         except:
             project = None
         role_obj = Role()
-        member = self.request.POST['member']
+        try:
+            member = self.request.POST['member']
+        except:
+            member = None
         if role_form.is_valid():
             role_start_datetime = str(self.request.POST['role_start_date_time'])
             role_start_datetime = datetime.strptime(role_start_datetime, '%m/%d/%Y %I:%M %p')
@@ -212,7 +214,8 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
 
             role_title = role_form.cleaned_data['role_title']
             role_obj.role_title = role_title
-            role_obj.member_id = member
+            if member:
+                role_obj.member_id = member
             role_obj.start_time = utc_role_start_datetime
             role_obj.end_time = utc_role_end_datetime
             role_obj.save()
@@ -238,12 +241,27 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
 
 
 
+class AddCrewInRoleView(LoginRequiredMixin, View):
+    def get(self, *args, **kwargs):
+        title   = self.kwargs['title']
+        role    = get_object_or_404(Role, id=self.kwargs['role_id'])
+        project = get_object_or_404(Project, id=self.kwargs['project_id'])
+        form    = AddCrewInRoleForm()
+        context = {'form': form, 'title': title, 'role': role, 'project': project}
+        return render(self.request, 'project/add_crew_in_role.html', context=context)
+
+    def post(self, *args, **kwargs):
+        title = self.kwargs['title']
+        role  = get_object_or_404(Role, id=self.kwargs['role_id'])
+        form = AddCrewInRoleForm()
+        pass
+
 
 
 class DeleteProjectView(LoginRequiredMixin, AdminAndManagerPermission, View):
     def get(self, *args, **kwargs):
         project = get_object_or_404(Project, id=self.kwargs['pk'])
-        project.delete()
+        # project.delete()
         messages.warning(self.request, 'Project deleted successfully !')
         return HttpResponseRedirect(reverse('dashboard:projects-list'))
 

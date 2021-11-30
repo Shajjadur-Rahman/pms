@@ -46,6 +46,42 @@
                       <h4><span class="text-info">Project Start :</span> {{ project.approve_status }}</h4>
                       <h4><span class="text-info">Project Leader :</span> {% if project.project_leader %}{{ project.project_leader }} assigned as Co-manager {% else %} Not added ! {% endif %}</h4>
                         <small><span class="text-info">Created on :</span> {{ project.created_at|timezone:local_tz }}</small>
+
+                        <table class="text-left" style="width: 100%">
+                            <thead>
+                            <tr class="py-4">
+                                <th>Role</th>
+                                <th>Crew</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for role in project.project_roles.all %}
+                            <tr>
+                              <td class="py-2">{{ role.role_title }}</td>
+                              <td class="py-2">{{ role.member }}</td>
+                              <td class="py-2">
+                               {% if role.member %}
+                                ------------
+                               {% else %}
+                                  <a class="btn btn-info btn-sm" title="Click to add project start and complete datetime" href="{% url 'dashboard:add-crew-in-role' title=role.role_title project_id=project.id role_id=role.id %}">
+                                  <i class="fas fa-plus">
+                                  </i>
+                                  Crew
+                                  </a>
+                              {% endif %}
+                              </td>
+                              {% empty %}
+                            </tr>
+                            <tr>
+                               <td colspan="3" class="text-center py-4"> Role not fount for <span class="text-info">{{ project.title }}</span></td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+
+
                       <p class="mt-4"><span class="text-info">Description : </span>{{ project.description }}</p>
                           <div class="form-check form-check-inline">
                             <input class="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1" {% if project.public %}checked{% endif %}>

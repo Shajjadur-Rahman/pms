@@ -56,4 +56,8 @@ class Role(models.Model):
     def __str__(self):
         return self.role_title
 
+    def save(self, *args, **kwargs):
+        self.role_title = slugify(self.role_title, instance=self)
+        super(Role, self).save(*args, **kwargs)
+
 

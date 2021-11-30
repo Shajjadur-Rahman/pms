@@ -1,6 +1,6 @@
 {% extends 'base/base.html' %}
 {% load static %}
-{% block title_block %} Add Role and date {% endblock %}
+{% block title_block %} Add Crew for Role : {{ title }} {% endblock %}
 {% block content_block %}
   <!-- Content Wrapper. Contains page content -->
   <div class="content-wrapper">
@@ -13,7 +13,7 @@
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Add project and Role</li>
+              <li class="breadcrumb-item active">Add Crew for Role : &nbsp; {{ title }}</li>
             </ol>
           </div>
         </div>
@@ -27,7 +27,7 @@
         <div class="col-md-12">
           <div class="card card-primary">
             <div class="card-header">
-              <h3 class="card-title">Add Role and Datetime for "{{ title }}"</h3>
+              <h3 class="card-title">Project : "{{ project.title }}" ===> Add Crew for "{{ title }}"</h3>
               <div class="card-tools">
                 <button type="button" class="btn btn-tool" data-card-widget="collapse" data-toggle="tooltip" title="Collapse">
                   <i class="fas fa-minus"></i></button>
@@ -47,30 +47,6 @@
             <div class="row">
                 <div class="col-md-8">
                 <div class="card-body">
-                  <div class="form-group">
-                    <label for="inputName">Role title</label>
-                   {{ role_form.role_title }}
-                   {{ role_form.role_title.errors }}
-                  </div>
-
-                  <div class="form-group">
-                    <label for="datetimepicker1">Role start datetime </label>
-                     <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                      <input type="text" name="role_start_date_time" class="form-control datetimepicker-input" data-target="#datetimepicker1"/>
-                      <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-                        <div class="input-group-text"><i class="fas fa-calendar-alt"></i></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="datetimepicker2">Role end datetime </label>
-                     <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
-                      <input type="text" name="role_end_date_time" class="form-control datetimepicker-input" data-target="#datetimepicker2"/>
-                      <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
-                        <div class="input-group-text"><i class="fas fa-calendar-alt"></i></div>
-                      </div>
-                    </div>
-                  </div>
 
                   <div class="form-group">
                         <label for="inputStatus">Select Crew</label>
@@ -84,37 +60,15 @@
                         {% endfor %}
                         </select>
                       </div>
-                  {% if datetime_add  %}
-                  <div class="form-group">
-                    <label for="datetimepicker3">Project start datetime </label>
-                     <div class="input-group date" id="datetimepicker3" data-target-input="nearest">
-                      <input type="text" name="project_start_date_time" class="form-control datetimepicker-input" data-target="#datetimepicker3"/>
-                      <div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker">
-                        <div class="input-group-text"><i class="fas fa-calendar-alt"></i></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <label for="datetimepicker4">Project end datetime </label>
-                     <div class="input-group date" id="datetimepicker4" data-target-input="nearest">
-                      <input type="text" name="project_end_date_time" class="form-control datetimepicker-input" data-target="#datetimepicker4"/>
-                      <div class="input-group-append" data-target="#datetimepicker4" data-toggle="datetimepicker">
-                        <div class="input-group-text"><i class="fas fa-calendar-alt"></i></div>
-                      </div>
-                    </div>
-                  </div>
-                  {% else %}
-
-                  {% endif%}
                 </div>
                 </div>
                 <div class="col-md-4">
                      <div class="card" style="height: 100%">
                       <div class="card-header">
-                          <h3>Available roles for <span class="text-info">{{ title }}</span> </h3>
+                          <h3>Project : <span class="text-info">{{ project.title }}</span> </h3>
                       </div>
                       <div class="card-body">
-                            <table class="text-left" style="width: 100%">
+                           <table class="text-left" style="width: 100%">
                             <thead>
                             <tr class="py-4">
                                 <th>Role</th>
@@ -164,7 +118,7 @@
       </div>
       <div class="row">
         <div class="col-12">
-            <a href="{% url 'dashboard:projects-list' %}" class="btn btn-primary text-white">Back</a>
+          <a href="{% url 'dashboard:project-detail' pk=project.id %}" class="btn btn-primary text-white">Back</a>
           <input type="reset" value="Reset" class="btn btn-secondary">
           <input type="submit" value="Create" class="btn btn-success">
         </div>
@@ -174,14 +128,4 @@
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-{% endblock %}
-
-{% block js_block %}
-    <!--Datetime picker Bootstrap 4 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-    <script>
-      $(function () {
-        $("#datetimepicker1").datetimepicker();
-      });
-    </script><!--End for Datetime picker Bootstrap 4 -->
 {% endblock %}

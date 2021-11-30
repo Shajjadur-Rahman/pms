@@ -122,22 +122,22 @@
                       <td class="project-actions text-right">
 
                           {% if approve_status == 'Approve' or request.user.user_type == 'Admin' %}
-                          <a class="btn btn-info btn-sm" title="Click to add project start and complete datetime" href="{% url 'dashboard:add-project-date-role' title=project.title pk=project.id %}">
+                          <a class="btn btn-info btn-sm" title="Click to add project start and complete datetime" href="{% url 'dashboard:add-project-date-role' title=project.title  pk=project.id %}">
                               <i class="fas fa-plus">
                               </i>
-                              Date
+                              Role
                           </a>
                           {% elif request.user.user_type == 'Manager' and project.approve_status == 'Pending' %}
                           <a class="btn btn-info btn-sm" title="Click to add project start and complete datetime" href="{% url 'dashboard:add-project-date-role' title=project.title pk=project.id %}">
                               <i class="fas fa-plus">
                               </i>
-                              Date
+                              Role
                           </a>
                           {% else %}
                           <button class="btn btn-info btn-sm" disabled>
                               <i class="fas fa-plus">
                               </i>
-                              Date
+                              Role
                           </button>
                           {% endif %}
 
@@ -234,7 +234,8 @@ function approve(id) {
     var stat__btn = document.getElementById(`status__btn${id}`)
         stat__btn.style.color = "white";
 
-        var url = `https://shajjadpms.herokuapp.com/project-approve/${id}/`
+
+        var url = `127.0.0.1:8000/project-approve/${id}/`
         fetch(url, {
         method: 'POST',
         headers: {
@@ -256,7 +257,7 @@ function deleteProject(id) {
         event.preventDefault()
         var delete_msg = document.getElementById("delete_msg")
         var delete_msg_wrapper = document.getElementById("delete_msg_wrapper")
-        var url = `https://shajjadpms.herokuapp.com//project-delete/${id}/`
+        var url = `var url = `127.0.0.1:8000/project-delete/${id}/`
        fetch(url, {
         method: 'POST',
        headers: {
