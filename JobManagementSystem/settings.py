@@ -141,6 +141,7 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
 # Celery app
 # REDIS_HOST = 'localhost'
 # CELERY_BROKER_URL = 'redis://:p2e249ee785968eb914d440c05326b4a0a9df8d71e4415413e861902b45917e6d@ec2-18-214-6-8.compute-1.amazonaws.com:13069'

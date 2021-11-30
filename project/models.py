@@ -21,7 +21,7 @@ class Project(models.Model):
     approve_by       = models.ForeignKey(settings.AUTH_USER_MODEL,
                                          on_delete=models.SET_NULL,
                                          related_name='projects_approved_by', null=True, blank=True)
-    public           = models.BooleanField(default=True)
+    public           = models.BooleanField(blank=True)
     public_shared    = models.DateTimeField(null=True, blank=True)
     created_at       = models.DateTimeField(auto_now_add=True)
     updated_at       = models.DateTimeField(auto_now=True)

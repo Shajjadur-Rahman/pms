@@ -17,6 +17,12 @@
                     </ol>
                   </div>
                 </div>
+
+                  <div id="msg_wrapper" class="alert alert-warning d-none" role="alert">
+                     <span id="msg"></span>
+                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                 </div>
+
               </div><!-- /.container-fluid -->
             </section>
           <!-- Main content -->
@@ -98,11 +104,8 @@
                                         <h5><span class="text-info">Shared publicly </span> : - {{ project.public_shared|timezone:local_tz }}</h5>
                                         <p><span class="text-info">Project description </span> : {{ project.sliced_description }}</p>
                                         <a class="btn btn-sm btn-primary text-white" style="cursor: pointer"><i class="fas fa-folder"></i> View</a>
-                                        {% if request.user in project.confirm_members.all %}
-                                        <button class="btn btn-sm btn-success text-white"><i class="far fa-check-circle"></i> Confirmed</button>
-                                        {% else %}
-                                        <a class="btn btn-sm btn-warning" style="cursor: pointer" title="Click to add this project"><i class="far fa-check-circle"></i> Pending</a>
-                                        {% endif %}
+
+                                        <button onclick=projectRequestConfirm({{project.id}}) id="request__btn{{project.id}}" class="btn btn-sm btn-{% if request.user in project.confirm_members.all %}success{% else %}warning{% endif %}"><i class="far fa-check-circle"></i>{% if request.user in project.confirm_members.all %}Confirmed{% else %}Pending{% endif %}</button>
 
                                     </div>
                                     <div class="post__right pl-4 ml-4" style="width: 30%">
@@ -143,3 +146,58 @@
     </section>
   </div>
 {% endblock %}
+
+
+{% block js_block %}
+<script>
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+function projectRequestConfirm(id) {
+    var request__btn = document.getElementById(`request__btn${id}`)
+
+    console.log("response", id)
+    console.log("response", request__btn)
+        request__btn.style.color = "white";
+        var url = `https://shajjadpms.herokuapp.com/project-request-accept/${id}/`
+<!--        var url = `http://127.0.0.1:8000/project-request-accept/${id}/`-->
+        fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrftoken
+        }
+        })
+        .then((response) => response.json())
+        .then((response) => {
+
+            request__btn.innerHTML = response.approve_status
+            request__btn.classList.remove('btn', 'btn-sm', 'btn-warning')
+            request__btn.classList.add('btn', 'btn-sm', 'btn-success')
+            msg_wrapper.classList.remove('alert', 'alert-warning', 'd-none')
+            msg_wrapper.classList.add('alert', 'alert-warning')
+            msg.innerHTML = response.approved_msg
+        })
+
+};
+
+
+
+</script>
+{% endblock %}
+

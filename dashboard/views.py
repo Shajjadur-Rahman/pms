@@ -31,16 +31,24 @@ def get_current_timezone():  # pip install tzlocal
     tz = get_localzone()
     return tz
 
+def native_to_utc(dt):
+    utc_dt = dt.combine(dt.now().date(), dt.now().time())
+    utc__datetime = utc_dt.astimezone(pytz.utc)
+    return utc__datetime
+
 class ProjectListView(LoginRequiredMixin, View):
     # template_name = 'project/projects.html'
 
     def get(self, *args, **kwargs):
         print(self.request.GET.get('search_text', ''))
         if self.request.user.user_type == 'Member' or self.request.user.user_type == 'Contact':
-
+            projects = Project.objects.filter(Q(members=self.request.user) |
+                                              Q(confirm_members=self.request.user), Q(completed=False)
+                                              )
+            total_project = projects.count()
             context = {
-               'projects': Project.objects.filter(members=self.request.user, completed=False),
-               'total_project': Project.objects.filter(members=self.request.user, completed=False).count(),
+               'projects': projects,
+               'total_project': total_project,
                'user': self.request.user,
                'local_tz': get_current_timezone(),
             }
@@ -51,6 +59,16 @@ class ProjectListView(LoginRequiredMixin, View):
             'local_tz': get_current_timezone(),
         }
         return render(self.request, 'project/projects.html', context=context)
+
+
+class ProjectRequestAcceptApiView(APIView):
+    def post(self, *args, **kwargs):
+        project        = get_object_or_404(Project, pk=self.kwargs['pk'])
+        project.confirm_members.add(self.request.user.id)
+        project.members.remove(self.request.user.id)
+        project.save()
+        return Response({'approve_status': 'Confirmed', 'approved_msg': f"You added this project : {project.title}"}, status=status.HTTP_200_OK)
+
 
 
 class PendingProjectView(LoginRequiredMixin, AdminAndManagerPermission, ListView):
@@ -131,7 +149,7 @@ class ProjectApproveApiView(APIView):
 
 
 
-class ProjectDeleteApiView(LoginRequiredMixin, AdminAndManagerPermission, APIView):
+class ProjectDeleteApiView(APIView):
     def post(self, *args, **kwargs):
         project = get_object_or_404(Project, pk=self.kwargs['pk'])
         roles = project.project_roles.all()
@@ -142,6 +160,7 @@ class ProjectDeleteApiView(LoginRequiredMixin, AdminAndManagerPermission, APIVie
                     role.delete()
                 except:
                     pass
+        project.delete()
         return Response({'success': 'Project successfully deleted !'}, status=status.HTTP_200_OK)
 
 
@@ -157,6 +176,9 @@ class CreateProjectView(LoginRequiredMixin, AdminAndManagerPermission, SuccessMe
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
+
+        if form.cleaned_data['public']:
+            form.instance.public_shared = native_to_utc(datetime)
         form.save()
         return super(CreateProjectView, self).form_valid(form)
 
