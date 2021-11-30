@@ -38,8 +38,8 @@
       <div class="card">
         <div class="card-header">
 
-             <div id="delete_msg_wrapper" class="alert alert-warning d-none" role="alert">
-                 <span id="delete_msg"></span>
+             <div id="msg_wrapper" class="alert alert-warning d-none" role="alert">
+                 <span id="msg"></span>
                  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
              </div>
 
@@ -233,7 +233,8 @@ const csrftoken = getCookie('csrftoken');
 function approve(id) {
     var stat__btn = document.getElementById(`status__btn${id}`)
         stat__btn.style.color = "white";
-        var url = `https://shajjadpms.herokuapp.com/project-approve/${id}/`
+<!--        var url = `https://shajjadpms.herokuapp.com/project-approve/${id}/`-->
+        var url = `http://127.0.0.1:8000/project-approve/${id}/`
         fetch(url, {
         method: 'POST',
         headers: {
@@ -243,9 +244,13 @@ function approve(id) {
         })
         .then((response) => response.json())
         .then((response) => {
+                    console.log(response)
             stat__btn.innerHTML = response.approve_status
             stat__btn.classList.remove('btn', 'btn-sm', 'btn-warning')
             stat__btn.classList.add('btn', 'btn-sm', 'btn-success')
+            msg_wrapper.classList.remove('alert', 'alert-warning', 'd-none')
+            msg_wrapper.classList.add('alert', 'alert-warning')
+            msg.innerHTML = response.approved_msg
         })
 
 };
@@ -255,7 +260,8 @@ function deleteProject(id) {
         event.preventDefault()
         var delete_msg = document.getElementById("delete_msg")
         var delete_msg_wrapper = document.getElementById("delete_msg_wrapper")
-        var url = `https://shajjadpms.herokuapp.com/project-delete/${id}/`
+<!--        var url = `https://shajjadpms.herokuapp.com/project-delete/${id}/`-->
+        var url = `http://127.0.0.1:8000/project-delete/${id}/`
        fetch(url, {
         method: 'POST',
        headers: {
@@ -266,9 +272,9 @@ function deleteProject(id) {
        .then((response) => response.json())
        .then((response) => {
            document.getElementById(`project_tr${id}`).remove()
-           delete_msg_wrapper.classList.remove('alert', 'alert-warning', 'd-none')
-           delete_msg_wrapper.classList.add('alert', 'alert-warning')
-           delete_msg.innerHTML = response.success
+           msg_wrapper.classList.remove('alert', 'alert-warning', 'd-none')
+           msg_wrapper.classList.add('alert', 'alert-warning')
+           msg.innerHTML = response.success
         })
 
 };

@@ -127,7 +127,7 @@ class ProjectApproveApiView(APIView):
         project.approve_status = 'Approve'
         project.approve_by = self.request.user
         project.save()
-        return Response({'approve_status': project.approve_status}, status=status.HTTP_200_OK)
+        return Response({'approve_status': project.approve_status, 'approved_msg': 'Project approved !'}, status=status.HTTP_200_OK)
 
 
 
@@ -258,12 +258,13 @@ class AddCrewInRoleView(LoginRequiredMixin, View):
 
 
 
-class DeleteProjectView(LoginRequiredMixin, AdminAndManagerPermission, View):
-    def get(self, *args, **kwargs):
-        project = get_object_or_404(Project, id=self.kwargs['pk'])
-        # project.delete()
-        messages.warning(self.request, 'Project deleted successfully !')
-        return HttpResponseRedirect(reverse('dashboard:projects-list'))
+# class DeleteProjectView(LoginRequiredMixin, AdminAndManagerPermission, View):
+#     def get(self, *args, **kwargs):
+#         print(self.kwargs['pk'])
+#         project = get_object_or_404(Project, id=self.kwargs['pk'])
+#         # project.delete()
+#         messages.warning(self.request, 'Project deleted successfully !')
+#         return HttpResponseRedirect(reverse('dashboard:projects-list'))
 
 
 
