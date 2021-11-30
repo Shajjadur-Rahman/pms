@@ -164,6 +164,7 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
         except:
             project = None
         role_form = ProjectRoleForm()
+        # roles     = Role.objects.all()
         if project.start_time and project.end_time:
             return render(self.request, 'project/add_project_date_and_role.html',
                           context={'role_form': role_form, 'title': title,  'datetime_add': False, 'project': project})

@@ -77,6 +77,7 @@
                         <select class="form-control custom-select" name="member">
                             <option selected disabled>Select one</option>
                         {% for user in project.confirm_members.all %}
+                            {% if user in project.project_roles. %}
                             <option value="{{ user.id }}">{{ user }}</option>
                         {% empty %}
                           <option>User not fount !</option>
@@ -115,7 +116,7 @@
                       <div class="card-body">
                           <ol>
                           {% for role in project.project_roles.all %}
-                              <li>Role : <span class="text-info">{{ role.role_title }}</span> &nbsp; &nbsp; Member/Contact : <span class="text-info">{{ role.member }}</span></li>
+                              <li>Role : <span class="text-info">{{ role.role_title }}</span> &nbsp; &nbsp; Crew : <span class="text-info">{{ role.member }}</span></li>
                           {% empty %}
                            <li> Role not fount for <span class="text-info">{{ title }}</span></li>
                           {% endfor %}
