@@ -234,8 +234,7 @@ function approve(id) {
     var stat__btn = document.getElementById(`status__btn${id}`)
         stat__btn.style.color = "white";
 
-
-        var url = `127.0.0.1:8000/project-approve/${id}/`
+        var url = `https://shajjadpms.herokuapp.com/project-approve/${id}/`
         fetch(url, {
         method: 'POST',
         headers: {
@@ -257,7 +256,7 @@ function deleteProject(id) {
         event.preventDefault()
         var delete_msg = document.getElementById("delete_msg")
         var delete_msg_wrapper = document.getElementById("delete_msg_wrapper")
-        var url = `var url = `127.0.0.1:8000/project-delete/${id}/`
+        var url = `https://shajjadpms.herokuapp.com//project-delete/${id}/`
        fetch(url, {
         method: 'POST',
        headers: {
