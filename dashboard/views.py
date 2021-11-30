@@ -134,7 +134,7 @@ class ProjectApproveApiView(APIView):
 class ProjectDeleteApiView(LoginRequiredMixin, AdminAndManagerPermission, APIView):
     def post(self, *args, **kwargs):
         project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        # project.delete()
+        project.delete()
         return Response({'success': 'Project successfully deleted !'}, status=status.HTTP_200_OK)
 
 
