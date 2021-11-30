@@ -166,17 +166,11 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
         role_form = ProjectRoleForm()
         if project.start_time and project.end_time:
             return render(self.request, 'project/add_project_date_and_role.html',
-<<<<<<< HEAD
                           context={'role_form': role_form, 'title': title,  'datetime_add': False, 'project': project})
         else:
             return render(self.request, 'project/add_project_date_and_role.html',
-                          context={'role_form': role_form, 'title': title,  'datetime_add': True, 'project': project})
-=======
                           context={'role_form': role_form, 'title': title, 'datetime_add': False, 'project': project})
-        else:
-            return render(self.request, 'project/add_project_date_and_role.html',
-                          context={'role_form': role_form, 'title': title, 'datetime_add': True, 'project': project})
->>>>>>> 6bbdd99bec5be5216a005999e0282d391be8fad9
+
 
     def post(self, *args, **kwargs):
         role_form = ProjectRoleForm(self.request.POST)
@@ -233,17 +227,13 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
 
                 if project.start_time and project.end_time:
                     return render(self.request, 'project/add_project_date_and_role.html',
-<<<<<<< HEAD
+
                                   context={'role_form': role_form,  'datetime_add': False, 'project': project})
                 else:
                     return render(self.request, 'project/add_project_date_and_role.html',
                                   context={'role_form': role_form,  'datetime_add': True, 'project': project})
-=======
-                                  context={'role_form': role_form, 'datetime_add': False, 'project': project})
-                else:
-                    return render(self.request, 'project/add_project_date_and_role.html',
-                                  context={'role_form': role_form, 'datetime_add': False, 'project': project})
->>>>>>> 6bbdd99bec5be5216a005999e0282d391be8fad9
+
+
 
 
 
