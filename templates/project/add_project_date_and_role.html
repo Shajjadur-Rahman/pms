@@ -33,17 +33,20 @@
                   <i class="fas fa-minus"></i></button>
               </div>
             </div>
-            		{% if messages %}
-                    {% for message in messages %}
-                    <div {% if message.tags %} class="alert alert-{{ message.tags }} {% endif %}" role="alert">
-                        {{ message }}  &nbsp; &nbsp; <a class="" href="{% url 'account:member-list' %}">View all available Members</a>
-                        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    </div>
-                    {% endfor %}
-                    {% endif %}
+            {% if messages %}
+            {% for message in messages %}
+            <div {% if message.tags %} class="alert alert-{{ message.tags }} {% endif %}" role="alert">
+                {{ message }}  &nbsp; &nbsp; <a class="" href="{% url 'account:member-list' %}">View all available Members</a>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            {% endfor %}
+            {% endif %}
 
 
-              <div class="card-body">
+
+            <div class="row">
+                <div class="col-md-8">
+                <div class="card-body">
                   <div class="form-group">
                     <label for="inputName">Role title</label>
                    {{ role_form.role_title }}
@@ -80,7 +83,7 @@
                         {% endfor %}
                         </select>
                       </div>
-                  {% if project  %}
+                  {% if datetime_add  %}
                   <div class="form-group">
                     <label for="datetimepicker3">Start datetime for "{{ title }}" </label>
                      <div class="input-group date" id="datetimepicker3" data-target-input="nearest">
@@ -102,8 +105,30 @@
                   {% else %}
 
                   {% endif%}
-
+                </div>
+                </div>
+                <div class="col-md-4">
+                     <div class="card" style="height: 100%">
+                      <div class="card-header">
+                          <h3>Available roles for <span class="text-info">{{ title }}</span> </h3>
+                      </div>
+                      <div class="card-body">
+                          <ol>
+                          {% for role in project.project_roles.all %}
+                              <li>Role : <span class="text-info">{{ role.role_title }}</span> &nbsp; &nbsp; Member/Contact : <span class="text-info">{{ role.member }}</span></li>
+                          {% empty %}
+                           <li> Role not fount for <span class="text-info">{{ title }}</span></li>
+                          {% endfor %}
+                          </ol>
+                      </div>
+                      <div class="card-footer">
+                          Members and Contacts are assigned individual role
+                          for <span class="text-info">{{ title }}</span>
+                      </div>
+                  </div>
+                </div>
             </div>
+
 
             <!-- /.card-body -->
 

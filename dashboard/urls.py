@@ -6,7 +6,7 @@ app_name = 'dashboard'
 
 urlpatterns = [
     path('', views.ProjectListView.as_view(), name='projects-list'),
-    path('project/add/date-role/<str:title>/<int:pk>/', views.AddProjectDateAndRole.as_view(), name='add-project-date-role'),
+    path('project/add-datetime-and-role/<str:title>/<int:pk>/', views.AddProjectDateAndRole.as_view(), name='add-project-date-role'),
     path('pending-projects/', views.PendingProjectView.as_view(), name='pending-projects'),
     path('completed-projects/', views.CompletedProjectView.as_view(), name='completed-projects'),
     path('project-approve/<int:pk>/', views.ProjectApproveApiView.as_view(), name='project-approve'),
