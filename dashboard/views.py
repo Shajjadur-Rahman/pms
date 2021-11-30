@@ -31,14 +31,16 @@ def get_current_timezone():  # pip install tzlocal
     tz = get_localzone()
     return tz
 
-def native_to_utc(dt):
+
+# ==========================================================
+def native_to_utc_1(dt):
     utc_dt = dt.combine(dt.now().date(), dt.now().time())
     utc__datetime = utc_dt.astimezone(pytz.utc)
     return utc__datetime
 
-class ProjectListView(LoginRequiredMixin, View):
-    # template_name = 'project/projects.html'
+# ============================================================
 
+class ProjectListView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
         print(self.request.GET.get('search_text', ''))
         if self.request.user.user_type == 'Member' or self.request.user.user_type == 'Contact':
@@ -178,11 +180,21 @@ class CreateProjectView(LoginRequiredMixin, AdminAndManagerPermission, SuccessMe
         form.instance.created_by = self.request.user
 
         if form.cleaned_data['public']:
-            form.instance.public_shared = native_to_utc(datetime)
+            form.instance.public_shared = native_to_utc_1(datetime)
         form.save()
         return super(CreateProjectView, self).form_valid(form)
 
 
+
+# =================================================
+
+def native_to_utc_2(role_dt):
+    role_start_dt = datetime.strptime(role_dt, '%m/%d/%Y %I:%M %p')
+    utc_role_start_datetime = datetime.combine(role_start_dt.date(), role_start_dt.time())
+    utc_role_start_datetime = utc_role_start_datetime.astimezone(pytz.utc)
+    return utc_role_start_datetime
+
+# =================================================
 
 
 class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View):
@@ -213,48 +225,31 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
         except:
             member = None
         if role_form.is_valid():
-            role_start_datetime = str(self.request.POST['role_start_date_time'])
-            role_start_datetime = datetime.strptime(role_start_datetime, '%m/%d/%Y %I:%M %p')
+            role_start_datetime = str(self.request.POST.get('role_start_date_time', ''))
+            role_start_datetime = native_to_utc_2(role_start_datetime) # Native datetime to UTC server datetime conversion
+            role_end_datetime = str(self.request.POST.get('role_end_date_time', ''))
+            role_end_datetime = native_to_utc_2(role_end_datetime)
 
-            # Native datetime to UTC server datetime conversion
-            utc_role_start_datetime = datetime.combine(role_start_datetime.date(), role_start_datetime.time())
-            utc_role_start_datetime = utc_role_start_datetime.astimezone(pytz.utc)
+            project_start_datetime = str(self.request.POST.get('project_start_date_time', ''))
+            project_start_datetime = native_to_utc_2(project_start_datetime)
 
-            role_end_datetime = str(self.request.POST['role_end_date_time'])
-            role_end_datetime = datetime.strptime(role_end_datetime, '%m/%d/%Y %I:%M %p')
-
-            # Native datetime to UTC server datetime conversion
-            utc_role_end_datetime = datetime.combine(role_end_datetime.date(), role_end_datetime.time())
-            utc_role_end_datetime = utc_role_end_datetime.astimezone(pytz.utc)
-
-            project_start_datetime = str(self.request.POST['project_start_date_time'])
-            project_start_datetime = datetime.strptime(project_start_datetime, '%m/%d/%Y %I:%M %p')
-
-            # Native datetime to UTC server datetime conversion
-            utc_project_start_datetime = datetime.combine(project_start_datetime.date(), project_start_datetime.time())
-            utc_project_start_datetime = utc_project_start_datetime.astimezone(pytz.utc)
-
-            project_end_datetime = str(self.request.POST['project_end_date_time'])
-            project_end_datetime = datetime.strptime(project_end_datetime, '%m/%d/%Y %I:%M %p')
-
-            # Native datetime to UTC server datetime conversion
-            utc_project_end_datetime = datetime.combine(project_end_datetime.date(), project_end_datetime.time())
-            utc_project_end_datetime = utc_project_end_datetime.astimezone(pytz.utc)
+            project_end_datetime = str(self.request.POST.get('project_end_date_time', ''))
+            project_end_datetime = native_to_utc_2(project_end_datetime)
 
             role_title = role_form.cleaned_data['role_title']
             role_obj.role_title = role_title
             if member:
                 role_obj.member_id = member
-            role_obj.start_time = utc_role_start_datetime
-            role_obj.end_time = utc_role_end_datetime
+            role_obj.start_time = role_start_datetime
+            role_obj.end_time = role_end_datetime
             role_obj.save()
             if project is not None:
                 if project.start_time and project.end_time:
                     project.project_roles.add(role_obj)
                     pass
                 else:
-                    project.start_time = utc_project_start_datetime
-                    project.end_time = utc_project_end_datetime
+                    project.start_time = project_start_datetime
+                    project.end_time = project_end_datetime
                     project.save()
                     project.project_roles.add(role_obj)
 
@@ -275,25 +270,20 @@ class AddCrewInRoleView(LoginRequiredMixin, View):
         title   = self.kwargs['title']
         role    = get_object_or_404(Role, id=self.kwargs['role_id'])
         project = get_object_or_404(Project, id=self.kwargs['project_id'])
-        form    = AddCrewInRoleForm()
+        form    = AddCrewInRoleForm(instance=role)
         context = {'form': form, 'title': title, 'role': role, 'project': project}
         return render(self.request, 'project/add_crew_in_role.html', context=context)
 
     def post(self, *args, **kwargs):
-        title = self.kwargs['title']
+        url = self.request.META.get('HTTP_REFERER')
         role  = get_object_or_404(Role, id=self.kwargs['role_id'])
-        form = AddCrewInRoleForm()
-        pass
+        form = AddCrewInRoleForm(self.request.POST, instance=role)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(url)
 
 
 
-# class DeleteProjectView(LoginRequiredMixin, AdminAndManagerPermission, View):
-#     def get(self, *args, **kwargs):
-#         print(self.kwargs['pk'])
-#         project = get_object_or_404(Project, id=self.kwargs['pk'])
-#         # project.delete()
-#         messages.warning(self.request, 'Project deleted successfully !')
-#         return HttpResponseRedirect(reverse('dashboard:projects-list'))
 
 
 
