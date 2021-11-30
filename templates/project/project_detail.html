@@ -41,7 +41,16 @@
                          {% load tz %}
                       <h3><span class="text-info">Project name :</span> {{ project.title }}</h3>
                       <h4><span class="text-info">Project Start :</span> {{ project.approve_status }}</h4>
-                      <h4><span class="text-info">Project Leader :</span> {% if project.project_leader %}{{ project.project_leader }} assigned as Co-manager {% else %} Not added ! {% endif %}</h4>
+                      <h4><span class="text-info">Project Leader :</span>
+                          {% if project.project_leader %}
+                              {% if project.project_leader.user_type == 'Manager' %}
+                                {{ project.project_leader }}
+                              {% else %}
+                                {{ project.project_leader.username }} ( Co-manager )
+                              {% endif %}
+                          {% else %}
+                          Not added !
+                          {% endif %}</h4>
                         <small><span class="text-info">Created on :</span> {{ project.created_at|timezone:local_tz }}</small>
 
                         <table class="text-left mt-4" style="width: 100%">
