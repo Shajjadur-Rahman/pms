@@ -134,7 +134,14 @@ class ProjectApproveApiView(APIView):
 class ProjectDeleteApiView(LoginRequiredMixin, AdminAndManagerPermission, APIView):
     def post(self, *args, **kwargs):
         project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        project.delete()
+        roles = project.project_roles.all()
+        if roles:
+            for role in roles:
+                try:
+                    role = Role.objects.get(id=role.id)
+                    role.delete()
+                except:
+                    pass
         return Response({'success': 'Project successfully deleted !'}, status=status.HTTP_200_OK)
 
 
