@@ -8,6 +8,7 @@ urlpatterns = [
     path('login/', views.LoginUserView.as_view(), name='login-user'),
     path('log-out/', views.LogOutView.as_view(), name='logout-user'),
     path('forget-password/', views.ForgetPassWordView.as_view(), name='forget-password'),
+    path('reset-password/<token>/', views.PasswordResetView.as_view(), name='reset-password'),
 
     path('create-manager/', views.AddManagerView.as_view(), name='create-manager'),
     path('member-list/', views.MemberListView.as_view(), name='member-list'),

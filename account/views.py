@@ -45,7 +45,6 @@ class LoginUserView(generic.View):
             if user is not None:
                 login(self.request, user)
                 return HttpResponseRedirect(reverse_lazy('dashboard:projects-list'))
-
         return render(self.request, 'account/login.html')
 
 
@@ -69,14 +68,44 @@ class ForgetPassWordView(generic.View):
         user = User.objects.filter(email=email).first()
         if not user:
             self.email_not_fount = 'No user fount with this email !'
-            return render(self.request, 'account/password_reset/forget_password.html', {'email_msg': self.email_not_fount})
+            return render(self.request, 'account/password_reset/forget_password.html', {'reset_msg': self.email_not_fount})
         token    = str(uuid.uuid4())
         user_obj = User.objects.get(email=self.request.POST['email'])
         user_obj.pass_token = token
         user_obj.save()
         forget_password_mail(user_obj.email, token)
         self.email_not_fount = 'An email is sent . Check your inbox Please!'
-        return render(self.request, 'account/password_reset/forget_password.html', {'email_msg': self.email_not_fount})
+        return render(self.request, 'account/password_reset/forget_password.html', {'reset_msg': self.email_not_fount})
+
+
+
+class PasswordResetView(generic.View):
+    password_error = ''
+    user_not_fount = ''
+    def get(self, *args, **kwargs):
+        token = self.kwargs['token']
+        return render(self.request, 'account/password_reset/reset_password_form.html')
+
+    def post(self, *args, **kwargs):
+        new_password = self.request.POST.get('new_password')
+        confirm_password = self.request.POST.get('confirm_password')
+        if new_password != confirm_password:
+            self.password_error = "Password mismatch ! Try again ...."
+            return render(self.request, 'account/password_reset/reset_password_form.html', {'reset_msg': self.password_error})
+
+        user_obj = User.objects.filter(pass_token=self.kwargs['token']).first()
+        if not user_obj:
+            self.password_error = "Account not fount ! Something went wrong ....!"
+            return render(self.request, 'account/password_reset/reset_password_form.html', {'reset_msg': self.user_not_fount})
+        user = User.objects.get(id=user_obj.id)
+        user.set_password(new_password)
+        user.save()
+        return HttpResponseRedirect(reverse_lazy('account:login-user'))
+
+
+
+
+
 
 
 
