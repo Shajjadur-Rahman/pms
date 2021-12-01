@@ -10,3 +10,12 @@ def forget_password_mail(email, token):
     recipient_list = [email]
     send_mail(subject, message, email_from, recipient_list)
     return True
+
+
+# email not send ? Server error 500 ? please visit https://accounts.google.com/DisplayUnlockCaptcha
+
+# Allow access to your Google account
+# As a security precaution, Google may require you to complete this additional step when signing into a new device or application.
+#
+# To allow access, click the Continue button below.
+
