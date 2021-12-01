@@ -103,7 +103,7 @@
                                         {% load tz %}
                                         <h5><span class="text-info">Shared publicly </span> : - {{ project.public_shared|timezone:local_tz }}</h5>
                                         <p><span class="text-info">Project description </span> : {{ project.sliced_description }}</p>
-                                        <a class="btn btn-sm btn-primary text-white" style="cursor: pointer"><i class="fas fa-folder"></i> View</a>
+                                        <a href="{% url 'dashboard:project-detail' pk=project.id %}" class="btn btn-sm btn-primary text-white" style="cursor: pointer"><i class="fas fa-folder"></i> View</a>
 
                                         <button onclick=projectRequestConfirm({{project.id}}) id="request__btn{{project.id}}" class="btn btn-sm btn-{% if request.user in project.confirm_members.all %}success{% else %}warning{% endif %}"><i class="far fa-check-circle"></i>{% if request.user in project.confirm_members.all %}Confirmed{% else %}Pending{% endif %}</button>
 

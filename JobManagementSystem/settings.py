@@ -1,24 +1,33 @@
 from pathlib import Path
+import environ
+import os
+
+env = environ.Env(
+    # set casting, default value
+    DEBUG=(bool, False)
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIRS = BASE_DIR / 'templates'
 STATIC_DIR = BASE_DIR / 'static'
 MEDIA_DIR = BASE_DIR / 'media'
-
+environ.Env.read_env()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-phys6#ls4s4k3td_n10ct%e=o+y!o*$u^9sfdi^-vnqwf$_-f-'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = False
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['shajjadpms.herokuapp.com', '127.0.0.1']
-# ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+if DEBUG:
+    ALLOWED_HOSTS += env('ALLOWED_HOSTS')
+
+
 
 
 # Application definition
@@ -41,7 +50,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    'whitenoise.middleware.WhiteNoiseMiddleware', # http://whitenoise.evans.io/en/stable/
+    # 'whitenoise.middleware.WhiteNoiseMiddleware', # http://whitenoise.evans.io/en/stable/
 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -80,7 +89,7 @@ LOGIN_URL = "/account/login/"
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': env('DB_NAME'),
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
@@ -131,7 +140,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
    STATIC_DIR,
 ]
-STATIC_ROOT=BASE_DIR/'assets'
+# STATIC_ROOT=BASE_DIR/'assets'
 
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'
@@ -143,12 +152,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'shaturngbd@gmail.com'
-EMAIL_HOST_PASSWORD = '@#shapla2021@#'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_BACKEND = env('EMAIL_BACKEND')
+EMAIL_HOST = env('EMAIL_HOST')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_USE_TLS = env('EMAIL_USE_TLS')
 
 
 # Celery app
