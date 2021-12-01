@@ -60,6 +60,7 @@ class LogOutView(generic.View):
 
 class ForgetPassWordView(generic.View):
     email_not_fount = ''
+    email_sent_success = ''
     def get(self, *args, **kwargs):
         return render(self.request, 'account/password_reset/forget_password.html')
 
@@ -68,12 +69,14 @@ class ForgetPassWordView(generic.View):
         user = User.objects.filter(email=email).first()
         if not user:
             self.email_not_fount = 'No user fount with this email !'
-            return render(self.request, 'account/password_reset/forget_password.html', {'error': self.email_not_fount})
+            return render(self.request, 'account/password_reset/forget_password.html', {'email_msg': self.email_not_fount})
         token    = str(uuid.uuid4())
         user_obj = User.objects.get(email=self.request.POST['email'])
         user_obj.pass_token = token
         user_obj.save()
-        forget_password_mail(user_obj, token)
+        forget_password_mail(user_obj.email, token)
+        self.email_not_fount = 'An email is sent . Check your inbox Please!'
+        return render(self.request, 'account/password_reset/forget_password.html', {'email_msg': self.email_not_fount})
 
 
 
