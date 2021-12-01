@@ -78,8 +78,8 @@ class ForgetPassWordView(generic.View):
         user_obj.pass_token = token
         user_obj.save()
         forget_password_mail(user_obj.email, token)
-        self.email_not_fount = 'An email is sent . Check your inbox Please!'
-        return render(self.request, 'account/password_reset/forget_password.html', {'reset_msg': self.email_not_fount})
+        self.email_sent_success = 'An email is sent . Check your inbox Please!'
+        return render(self.request, 'account/password_reset/forget_password.html', {'reset_msg': self.email_sent_success})
 
 
 
