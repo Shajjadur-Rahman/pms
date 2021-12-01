@@ -38,6 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     username   = models.CharField(max_length=50, blank=True, null=True)
     email      = models.EmailField(unique=True, null=False)
     co_manager = models.BooleanField(default=False)
+    pass_token = models.CharField(max_length=1000, null=True, blank=True)
     is_staff   = models.BooleanField(
         ugettext_lazy("Staff Status"),
         default=False,

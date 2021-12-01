@@ -12,6 +12,8 @@ from .models import User, Profile
 from project.models import Project
 from dashboard.views import get_current_timezone
 from account.permission import PermissionForAllUser, AdminAndManagerPermission
+from .helpers import forget_password_mail
+import uuid
 
 
 
@@ -21,7 +23,7 @@ class RegisterView(generic.View):
         return render(self.request, 'account/register.html', context={'form': form})
 
     def post(self, *args, **kwargs):
-            form = CustomUserCreationForm(request.POST)
+            form = CustomUserCreationForm(self.request.POST)
             if form.is_valid():
                 form_obj = form.save(commit=False)
                 form_obj.user_type = 'Contact'
@@ -52,6 +54,39 @@ class LogOutView(generic.View):
     def get(self, *args, **kwargs):
         logout(self.request)
         return HttpResponseRedirect(reverse_lazy('account:login-user'))
+
+
+
+
+class ForgetPassWordView(generic.View):
+    email_not_fount = ''
+    def get(self, *args, **kwargs):
+        return render(self.request, 'account/password_reset/forget_password.html')
+
+    def post(self, *args, **kwargs):
+        email = self.request.POST['email']
+        user = User.objects.filter(email=email).first()
+        if not user:
+            self.email_not_fount = 'No user fount with this email !'
+            return render(self.request, 'account/password_reset/forget_password.html', {'error': self.email_not_fount})
+        token    = str(uuid.uuid4())
+        user_obj = User.objects.get(email=self.request.POST['email'])
+        user_obj.pass_token = token
+        user_obj.save()
+        forget_password_mail(user_obj, token)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
