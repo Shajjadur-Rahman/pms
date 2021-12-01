@@ -19,6 +19,8 @@ import uuid
 
 class RegisterView(generic.View):
     def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return HttpResponseRedirect(reverse('dashboard:projects-list'))
         form = CustomUserCreationForm()
         return render(self.request, 'account/register.html', context={'form': form})
 
@@ -35,6 +37,8 @@ class RegisterView(generic.View):
 
 class LoginUserView(generic.View):
     def get(self, *args, **kwargs):
+        if self.request.user.is_authenticated:
+            return HttpResponseRedirect(reverse('dashboard:projects-list'))
         return render(self.request, 'account/login.html')
 
     def post(self, *args, **kwargs):
