@@ -50,7 +50,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # 'whitenoise.middleware.WhiteNoiseMiddleware', # http://whitenoise.evans.io/en/stable/
+    'whitenoise.middleware.WhiteNoiseMiddleware', # http://whitenoise.evans.io/en/stable/
 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -140,7 +140,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
    STATIC_DIR,
 ]
-# STATIC_ROOT=BASE_DIR/'assets'
+STATIC_ROOT=BASE_DIR/'assets'
 
 MEDIA_ROOT = MEDIA_DIR
 MEDIA_URL = '/media/'
