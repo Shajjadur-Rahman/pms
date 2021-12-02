@@ -109,13 +109,6 @@ class PasswordResetView(generic.View):
 
 
 
-
-
-
-
-
-
-
 class AddManagerView(LoginRequiredMixin, AdminAndManagerPermission, generic.View):
 
     def get(self, *args, **kwargs):

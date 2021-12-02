@@ -49,7 +49,10 @@ class ProjectListView(LoginRequiredMixin, View):
                                               Q(confirm_members=self.request.user), Q(completed=False)
                                               )
             total_project = projects.count()
-            context = {
+            paginator     = Paginator(projects, 4)
+            page_number   = self.request.GET.get('page')
+            projects      = paginator.get_page(page_number)
+            context       = {
                'projects': projects,
                'total_project': total_project,
                'user': self.request.user,
