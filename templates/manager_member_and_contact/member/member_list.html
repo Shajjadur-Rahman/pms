@@ -30,9 +30,8 @@
           <div class="row d-flex align-items-stretch">
           {% for member in members %}
             <div class="col-12 col-sm-6 col-md-4 d-flex align-items-stretch">
-              <div class="card bg-light">
+              <div class="card bg-light" style="width: 100%">
                 <div class="card-header text-muted border-bottom-0">
-                  Digital Strategist
                 </div>
                 <div class="card-body pt-0">
                   <div class="row">
@@ -75,15 +74,20 @@
         <!-- /.card-body -->
         <div class="card-footer">
           <nav aria-label="Contacts Page Navigation">
-            <ul class="pagination justify-content-center m-0">
-              <li class="page-item active"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item"><a class="page-link" href="#">4</a></li>
-              <li class="page-item"><a class="page-link" href="#">5</a></li>
-              <li class="page-item"><a class="page-link" href="#">6</a></li>
-              <li class="page-item"><a class="page-link" href="#">7</a></li>
-              <li class="page-item"><a class="page-link" href="#">8</a></li>
+            <ul class="pagination rounded-separated pagination-danger">
+                {% if members.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ members.previous_page_number }}"> <<</a></li>
+                {% endif %}
+                {% for num in members.paginator.page_range %}
+                {% if members.number == num %}
+                <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% else %}
+                <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% if members.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ members.next_page_number }}"> >> </a></li>
+                {% endif %}
             </ul>
           </nav>
         </div>

@@ -36,7 +36,7 @@
             		{% if messages %}
                     {% for message in messages %}
                     <div {% if message.tags %} class="alert alert-{{ message.tags }} {% endif %}" role="alert">
-                        {{ message }}  &nbsp; &nbsp; <a class="" href="{% url 'account:member-list' %}">View all available Members</a>
+                        {{ message }}  &nbsp; &nbsp;
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                     </div>
                     {% endfor %}

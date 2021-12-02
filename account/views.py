@@ -133,13 +133,8 @@ class AddManagerView(LoginRequiredMixin, AdminAndManagerPermission, generic.View
         return render(request, 'manager_member_and_contact/create_user.html', context={'form': form, 'user_type': 'Manager'})
 
 
-
-class MemberListView(LoginRequiredMixin, generic.ListView):
-    model         = User
-    template_name = 'manager_member_and_contact/member/member_list.html'
-    context_object_name = 'members'
-
-    def get_queryset(self, *args, **kwargs):
+class MemberListView(LoginRequiredMixin, generic.View):
+    def get(self, *args, **kwargs):
         search_text = self.request.GET.get('search_text', '')
         members     = User.objects.filter(user_type='Member')
         if search_text:
@@ -148,13 +143,15 @@ class MemberListView(LoginRequiredMixin, generic.ListView):
                 Q(email__icontains=search_text) |
                 Q(profile__phone_no=search_text)
             )
-            return members
-        return members
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(MemberListView, self).get_context_data(**kwargs)
-        context['local_tz'] = get_current_timezone()
-        return context
+        local_tz = get_current_timezone()
+        paginator = Paginator(members, 5)
+        page_number = self.request.GET.get('page')
+        members = paginator.get_page(page_number)
+        context = {
+            'members': members,
+            'local_tz': local_tz
+        }
+        return render(self.request, 'manager_member_and_contact/member/member_list.html', context=context)
 
 
 class CreateMemberView(LoginRequiredMixin, AdminAndManagerPermission, generic.View):
@@ -174,12 +171,8 @@ class CreateMemberView(LoginRequiredMixin, AdminAndManagerPermission, generic.Vi
 
 
 
-class ContactListView(LoginRequiredMixin, generic.ListView):
-    model               = User
-    template_name       = 'manager_member_and_contact/contact/contact_list.html'
-    context_object_name = 'contacts'
-
-    def get_queryset(self, *args, **kwargs):
+class ContactListView(LoginRequiredMixin, generic.View):
+    def get(self, *args, **kwargs):
         search_text = self.request.GET.get('search_text', '')
         contacts    = User.objects.filter(user_type='Contact')
         if search_text:
@@ -188,42 +181,27 @@ class ContactListView(LoginRequiredMixin, generic.ListView):
                 Q(email__icontains=search_text) |
                 Q(profile__phone_no=search_text)
             )
-            return contacts
-        return contacts
-
-    def get_context_data(self, *args, **kwargs):
-        context = super(ContactListView, self).get_context_data(**kwargs)
-        context['local_tz'] = get_current_timezone()
-        return context
-
-
-
-# class ContactAndMemberDetailView(LoginRequiredMixin, generic.DetailView):
-#     model               = User
-#     template_name       = 'manager_member_and_contact/user_detail.html'
-#     slug_field          = 'pk'
-#     slug_url_kwarg      = 'pk'
-#     paginate_by         = 4
-#
-#     def get_context_data(self, *args, **kwargs):
-#         context            = super(ContactAndMemberDetailView, self).get_context_data(**kwargs)
-#         context['user'] = get_object_or_404(User, pk=self.kwargs['pk'])
-#         context['projects'] = Project.objects.filter(members=self.kwargs['pk'], public=True)
-#         context['local_tz'] = get_current_timezone()
-#         return context
-
+        local_tz    = get_current_timezone()
+        paginator   = Paginator(contacts, 5)
+        page_number = self.request.GET.get('page')
+        contacts    = paginator.get_page(page_number)
+        context     = {
+            'contacts': contacts,
+            'local_tz': local_tz
+        }
+        return render(self.request, 'manager_member_and_contact/contact/contact_list.html', context=context)
 
 
 class ContactAndMemberDetailView(LoginRequiredMixin, generic.View):
     def get(self, *args, **kwargs):
-        user     = get_object_or_404(User, pk=self.kwargs['pk'])
-        projects = Project.objects.filter(members=self.kwargs['pk'], public=True)
+        user         = get_object_or_404(User, pk=self.kwargs['pk'])
+        projects     = Project.objects.filter(members=self.kwargs['pk'], public=True)
         ttl_projects = projects.count()
-        local_tz = get_current_timezone()
-        paginator = Paginator(projects, 3)
-        page_number = self.request.GET.get('page')
-        projects = paginator.get_page(page_number)
-        context = {
+        local_tz     = get_current_timezone()
+        paginator    = Paginator(projects, 2)
+        page_number  = self.request.GET.get('page')
+        projects     = paginator.get_page(page_number)
+        context      = {
             'user': user,
             'projects': projects,
             'ttl_projects': ttl_projects,
