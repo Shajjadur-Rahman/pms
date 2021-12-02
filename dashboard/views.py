@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import Q
 from project.models import Project, Role
-from account.models import User
+from account.models import User, Profile
 from datetime import datetime
 from tzlocal import get_localzone
 from account.permission import PermissionForAllUser, AdminAndManagerPermission
@@ -189,7 +189,6 @@ class CreateProjectView(LoginRequiredMixin, AdminAndManagerPermission, SuccessMe
             form.instance.public_shared = native_to_utc_1(datetime)
         form.save()
         return super(CreateProjectView, self).form_valid(form)
-
 
 
 # =================================================

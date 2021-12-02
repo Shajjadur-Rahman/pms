@@ -88,23 +88,25 @@
                 <div class="card">
                 <div class="card-header mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>Your projects</h2> 
+                        <h2>Your projects</h2>
+
                         <form action="" method="GET">
                             <div class="d-flex align-items-center">
-                            <div class="input-group input-group-sm">
-                            <select class="form-control" name="approve_status" defaultValue="{{ request.GET.approve_status }}">
-                                <option disabled selected>{% if request.GET.approve_status %} {{ request.GET.approve_status }} {% else %} Select {% endif %}</option>
-                                <option value="Pending">Pending</option>
-                                <option value="Approve">Approve</option>
-                            </select>
-                            <div class="input-group-append">
-                                <button class="btn btn-navbar btn-secondary" style="color: #ddd;" type="submit">
-                                    <i class="fas fa-search"></i>
-                                </button>
+                                <div class="input-group input-group-sm">
+                                    <select class="form-control" name="approve_status" defaultValue="{{ request.GET.approve_status }}">
+                                        <option disabled selected>{% if request.GET.approve_status %} {{ request.GET.approve_status }} {% else %} Select {% endif %}</option>
+                                        <option value="Pending">Pending</option>
+                                        <option value="Approve">Approve</option>
+                                    </select>
+                                    <div class="input-group-append">
+                                        <button class="btn btn-navbar btn-secondary" style="color: #ddd;" type="submit">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                            </div>
-                        </div>
                         </form>
+
                     </div>
                 </div>
                   <div class="card-body">
@@ -143,8 +145,8 @@
                                     </div>
                                 </div>
                                  {% empty %}
-                               <div class="post">
-                                   No fount !
+                               <div class="post text-danger">
+                                   Project not fount !
                                </div>
                                  {% endfor %}
                                 <!-- /.post -->

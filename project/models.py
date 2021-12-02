@@ -28,8 +28,10 @@ class Project(models.Model):
     confirm_members  = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='confirm_members', blank=True)
     completed        = models.BooleanField(default=False)
 
-    start_time = models.DateTimeField(null=True, blank=True)
-    end_time   = models.DateTimeField(null=True, blank=True)
+    start_time       = models.DateTimeField(null=True, blank=True)
+    end_time         = models.DateTimeField(null=True, blank=True)
+
+    attachments      = models.ManyToManyField('AttachmentFile', related_name='attachments', blank=True)
 
 
 
@@ -57,5 +59,12 @@ class Role(models.Model):
         return self.role_title
 
 
+def upload_attachment(instance, filename):
+    return '/'.join(['file_name', str(instance.file_name), filename])
 
+class AttachmentFile(models.Model):
+    file_title   = models.CharField(max_length=250, null=True, blank=True)
+    attach_file  = models.FileField(upload_to=upload_attachment, null=True, blank=True)
 
+    def __str__(self):
+        return str(self.pk)
