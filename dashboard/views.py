@@ -43,12 +43,14 @@ def native_to_utc_1(dt):
 
 class ProjectListView(LoginRequiredMixin, View):
     def get(self, *args, **kwargs):
-        print(self.request.GET.get('search_text', ''))
+        approve_status = self.request.GET.get('approve_status', '')
         if self.request.user.user_type == 'Member' or self.request.user.user_type == 'Contact':
             projects = Project.objects.filter(Q(members=self.request.user) |
                                               Q(confirm_members=self.request.user), Q(completed=False)
                                               )
             total_project = projects.count()
+            if approve_status:
+                projects = projects.filter(approve_status=approve_status)
             paginator     = Paginator(projects, 4)
             page_number   = self.request.GET.get('page')
             projects      = paginator.get_page(page_number)
