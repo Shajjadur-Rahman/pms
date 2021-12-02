@@ -115,17 +115,6 @@ class PasswordResetView(generic.View):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 class AddManagerView(LoginRequiredMixin, AdminAndManagerPermission, generic.View):
 
     def get(self, *args, **kwargs):
@@ -165,21 +154,6 @@ class MemberListView(LoginRequiredMixin, generic.ListView):
         context = super(MemberListView, self).get_context_data(**kwargs)
         context['local_tz'] = get_current_timezone()
         return context
-
-
-class MemberDetailView(LoginRequiredMixin, generic.DetailView):
-    model               = User
-    template_name       = 'manager_member_and_contact/user_detail.html'
-    slug_field          = 'pk'
-    slug_url_kwarg      = 'pk'
-
-    def get_context_data(self, *args, **kwargs):
-        context            = super(MemberDetailView, self).get_context_data(**kwargs)
-        context['user'] = get_object_or_404(User, pk=self.kwargs['pk'])
-        context['projects'] = Project.objects.filter(members=self.kwargs['pk'])
-        context['local_tz'] = get_current_timezone()
-        return context
-
 
 
 class CreateMemberView(LoginRequiredMixin, AdminAndManagerPermission, generic.View):
@@ -223,16 +197,16 @@ class ContactListView(LoginRequiredMixin, generic.ListView):
 
 
 
-class ContactDetailView(LoginRequiredMixin, generic.DetailView):
+class ContactAndMemberDetailView(LoginRequiredMixin, generic.DetailView):
     model               = User
     template_name       = 'manager_member_and_contact/user_detail.html'
     slug_field          = 'pk'
     slug_url_kwarg      = 'pk'
 
     def get_context_data(self, *args, **kwargs):
-        context            = super(ContactDetailView, self).get_context_data(**kwargs)
+        context            = super(ContactAndMemberDetailView, self).get_context_data(**kwargs)
         context['user'] = get_object_or_404(User, pk=self.kwargs['pk'])
-        context['projects'] = Project.objects.filter(members=self.kwargs['pk'])
+        context['projects'] = Project.objects.filter(members=self.kwargs['pk'], public=True)
         context['local_tz'] = get_current_timezone()
         return context
 

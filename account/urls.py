@@ -12,9 +12,9 @@ urlpatterns = [
 
     path('create-manager/', views.AddManagerView.as_view(), name='create-manager'),
     path('member-list/', views.MemberListView.as_view(), name='member-list'),
-    path('member/profile/<int:pk>/', views.MemberDetailView.as_view(), name='member-profile'),
     path('create-member/', views.CreateMemberView.as_view(), name='create-member'),
     path('contact-list/', views.ContactListView.as_view(), name='contact-list'),
-    path('contact/profile/<int:pk>/', views.ContactDetailView.as_view(), name='contact-profile'),
+    path('contact/profile/<int:pk>/', views.ContactAndMemberDetailView.as_view(), name='contact-profile'),
+    path('member/profile/<int:pk>/', views.ContactAndMemberDetailView.as_view(), name='member-profile'),
     path('create-contact/', views.CreateContactView.as_view(), name='create-contact'),
 ]
