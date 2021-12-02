@@ -46,7 +46,7 @@
 
                             <ul class="list-group list-group-unbordered mb-3">
                               <li class="list-group-item">
-                                <b>Project incoming request</b> <a class="float-right"></a>
+                                <b>Total Project</b> {{ ttl_projects }} <a class="float-right"></a>
                               </li>
                               <li class="list-group-item">
                                 <b>Username</b> <a class="float-right">{% if user.username %}{{ user.username }}{% else %} Null {% endif %}</a>
@@ -113,6 +113,7 @@
                                     {% endfor %}
                                     </div>
                                 </div>
+
                                  {% empty %}
                                <div class="post">
                                    No fount !
@@ -120,6 +121,29 @@
                                  {% endfor %}
                                 <!-- /.post -->
                           </div>
+
+                         <div class="col-md-12">
+                              <div class="mt-4">
+                                  <nav aria-label="Contacts Page Navigation pt-4">
+                                <ul class="pagination rounded-separated pagination-danger">
+                                    {% if projects.has_previous %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ projects.previous_page_number }}"><i class="mdi mdi-chevron-left"></i></a></li>
+                                    {% endif %}
+                                    {% for num in projects.paginator.page_range %}
+                                    {% if projects.number == num %}
+                                    <li class="page-item active"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                    {% else %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                                    {% endif %}
+                                    {% endfor %}
+                                    {% if projects.has_next %}
+                                    <li class="page-item"><a class="page-link" href="?page={{ projects.next_page_number }}"><i class="mdi mdi-chevron-right"></i></a></li>
+                                    {% endif %}
+                                </ul>
+                              </nav>
+                              </div>
+                         </div>
+
                       </div>
                   </div><!-- /.card-body -->
                 </div>

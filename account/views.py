@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from django.views import generic
 from django.db.models import Q
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.contrib import messages
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
@@ -197,18 +198,39 @@ class ContactListView(LoginRequiredMixin, generic.ListView):
 
 
 
-class ContactAndMemberDetailView(LoginRequiredMixin, generic.DetailView):
-    model               = User
-    template_name       = 'manager_member_and_contact/user_detail.html'
-    slug_field          = 'pk'
-    slug_url_kwarg      = 'pk'
+# class ContactAndMemberDetailView(LoginRequiredMixin, generic.DetailView):
+#     model               = User
+#     template_name       = 'manager_member_and_contact/user_detail.html'
+#     slug_field          = 'pk'
+#     slug_url_kwarg      = 'pk'
+#     paginate_by         = 4
+#
+#     def get_context_data(self, *args, **kwargs):
+#         context            = super(ContactAndMemberDetailView, self).get_context_data(**kwargs)
+#         context['user'] = get_object_or_404(User, pk=self.kwargs['pk'])
+#         context['projects'] = Project.objects.filter(members=self.kwargs['pk'], public=True)
+#         context['local_tz'] = get_current_timezone()
+#         return context
 
-    def get_context_data(self, *args, **kwargs):
-        context            = super(ContactAndMemberDetailView, self).get_context_data(**kwargs)
-        context['user'] = get_object_or_404(User, pk=self.kwargs['pk'])
-        context['projects'] = Project.objects.filter(members=self.kwargs['pk'], public=True)
-        context['local_tz'] = get_current_timezone()
-        return context
+
+
+class ContactAndMemberDetailView(LoginRequiredMixin, generic.View):
+    def get(self, *args, **kwargs):
+        user     = get_object_or_404(User, pk=self.kwargs['pk'])
+        projects = Project.objects.filter(members=self.kwargs['pk'], public=True)
+        ttl_projects = projects.count()
+        local_tz = get_current_timezone()
+        paginator = Paginator(projects, 3)
+        page_number = self.request.GET.get('page')
+        projects = paginator.get_page(page_number)
+        context = {
+            'user': user,
+            'projects': projects,
+            'ttl_projects': ttl_projects,
+            'local_tz': local_tz
+        }
+        return render(self.request, 'manager_member_and_contact/user_detail.html', context=context)
+
 
 
 class CreateContactView(LoginRequiredMixin, AdminAndManagerPermission, generic.View):
