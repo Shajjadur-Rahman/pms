@@ -2,11 +2,12 @@ from django.shortcuts import render, get_object_or_404, reverse
 from django.urls import reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import inlineformset_factory
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.paginator import Paginator
 from django.contrib import messages
 from django.db.models import Q
-from project.models import Project, Role
+from project.models import Project, Role, AttachmentFile
 from account.models import User, Profile
 from datetime import datetime
 from tzlocal import get_localzone
@@ -145,6 +146,19 @@ class ProjectUpdateView(LoginRequiredMixin, AdminAndManagerPermission, UpdateVie
         context['local_tz'] = get_current_timezone()
         return context
 
+    def form_valid(self, form):
+        form.instance.created_by = self.request.user
+        if form.cleaned_data['public']:
+            form.instance.public_shared = native_to_utc_1(datetime)
+        else:
+            form.instance.public_shared = None
+        self.object = form.save()
+        images = self.request.FILES.getlist('file_name')
+        for image in images:
+            project = AttachmentFile.objects.create(project_id=self.object.id)
+            project.attach_file = image
+            project.save()
+        return super(ProjectUpdateView, self).form_valid(form)
 
 
 class ProjectApproveApiView(APIView):
@@ -160,20 +174,18 @@ class ProjectApproveApiView(APIView):
 class ProjectDeleteApiView(APIView):
     def post(self, *args, **kwargs):
         project = get_object_or_404(Project, pk=self.kwargs['pk'])
-        roles = project.project_roles.all()
-        if roles:
-            for role in roles:
-                try:
-                    role = Role.objects.get(id=role.id)
-                    role.delete()
-                except:
-                    pass
         project.delete()
         return Response({'success': 'Project successfully deleted !'}, status=status.HTTP_200_OK)
 
 
-class CreateProjectView(LoginRequiredMixin, AdminAndManagerPermission, SuccessMessageMixin, CreateView):
+class AttachFileDeleteApiView(APIView):
+    def post(self, *args, **kwargs):
+        file = get_object_or_404(AttachmentFile, pk=self.kwargs['pk'])
+        file.delete()
+        return Response({'success': 'Attachment file successfully deleted !'}, status=status.HTTP_200_OK)
 
+
+class CreateProjectView(LoginRequiredMixin, AdminAndManagerPermission, SuccessMessageMixin, CreateView):
     model               = Project
     template_name       = 'project/project_create.html'
     form_class          = ProjectCreateForm
@@ -184,25 +196,32 @@ class CreateProjectView(LoginRequiredMixin, AdminAndManagerPermission, SuccessMe
 
     def form_valid(self, form):
         form.instance.created_by = self.request.user
-
         if form.cleaned_data['public']:
             form.instance.public_shared = native_to_utc_1(datetime)
-        form.save()
+        self.object = form.save()
+        images = self.request.FILES.getlist('file_name')
+        for image in images:
+            project = AttachmentFile.objects.create(project_id=self.object.id)
+            project.attach_file = image
+            project.save()
         return super(CreateProjectView, self).form_valid(form)
+
 
 
 # =================================================
 
-def native_to_utc_2(role_dt):
-    role_start_dt = datetime.strptime(role_dt, '%m/%d/%Y %I:%M %p')
-    utc_role_start_datetime = datetime.combine(role_start_dt.date(), role_start_dt.time())
-    utc_role_start_datetime = utc_role_start_datetime.astimezone(pytz.utc)
-    return utc_role_start_datetime
+def native_to_utc_2(dt):
+    str_date = str(dt)
+    formatted_dt = datetime.strptime(str_date, '%m/%d/%Y %I:%M %p')
+    combine_datetime = formatted_dt.combine(formatted_dt.date(), formatted_dt.time())
+    utc_datetime = combine_datetime.astimezone(pytz.utc)
+    return utc_datetime
 
 # =================================================
 
 
 class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View):
+
     def get(self, *args, **kwargs):
         title     = self.kwargs['title']
         try:
@@ -224,40 +243,37 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
             project = Project.objects.get(id=self.kwargs['pk'])
         except:
             project = None
-        role_obj = Role()
         try:
             member = self.request.POST['member']
         except:
             member = None
         if role_form.is_valid():
-            role_start_datetime = str(self.request.POST.get('role_start_date_time', ''))
+            role_start_datetime = self.request.POST.get('role_start_date_time', '')
             role_start_datetime = native_to_utc_2(role_start_datetime) # Native datetime to UTC server datetime conversion
-            role_end_datetime = str(self.request.POST.get('role_end_date_time', ''))
+            role_end_datetime = self.request.POST.get('role_end_date_time', '')
             role_end_datetime = native_to_utc_2(role_end_datetime)
 
-            project_start_datetime = str(self.request.POST.get('project_start_date_time', ''))
-            project_start_datetime = native_to_utc_2(project_start_datetime)
+            project_start_datetime = self.request.POST.get('project_start_date_time', '')
+            if project_start_datetime:
+                project_start_datetime = native_to_utc_2(project_start_datetime)
+            project_end_datetime = self.request.POST.get('project_end_date_time', '')
+            if project_end_datetime:
+                project_end_datetime = native_to_utc_2(project_end_datetime)
+            role_form_obj = role_form.save(commit=False)
 
-            project_end_datetime = str(self.request.POST.get('project_end_date_time', ''))
-            project_end_datetime = native_to_utc_2(project_end_datetime)
-
-            role_title = role_form.cleaned_data['role_title']
-            role_obj.role_title = role_title
             if member:
-                role_obj.member_id = member
-            role_obj.start_time = role_start_datetime
-            role_obj.end_time = role_end_datetime
-            role_obj.save()
+                role_form_obj.member_id = member
+            role_form_obj.project_id = project.id
+            role_form_obj.start_time = role_start_datetime
+            role_form_obj.end_time = role_end_datetime
+            role_form_obj.save()
             if project is not None:
                 if project.start_time and project.end_time:
-                    project.project_roles.add(role_obj)
                     pass
                 else:
                     project.start_time = project_start_datetime
                     project.end_time = project_end_datetime
                     project.save()
-                    project.project_roles.add(role_obj)
-
                 if project.start_time and project.end_time:
                     return render(self.request, 'project/add_project_date_and_role.html',
 
@@ -265,8 +281,6 @@ class AddProjectDateAndRole(LoginRequiredMixin, AdminAndManagerPermission, View)
                 else:
                     return render(self.request, 'project/add_project_date_and_role.html',
                                   context={'role_form': role_form,  'datetime_add': True, 'project': project})
-
-
 
 
 

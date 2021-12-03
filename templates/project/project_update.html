@@ -22,7 +22,7 @@
 
     <!-- Main content -->
     <section class="content">
-      <form action="" method="POST">{% csrf_token %}
+      <form action="" method="POST" enctype="multipart/form-data">{% csrf_token %}
       <div class="row">
         <div class="col-md-12">
           <div class="card card-primary">
@@ -44,16 +44,60 @@
             <div class="d-flex">
               <div class="card-body">
               <div class="form-group">
-                <label for="inputName">Update Project name / title *</label>
+                <label for="inputName">Update project name / title *</label>
                {{ form.title }}
               </div>
               <div class="form-group">
-                <label for="inputDescription">Update Project Description *</label>
+                <label for="inputDescription">Update project description *</label>
                 {{ form.description }}
               </div>
               <div class="form-group">
-                <label for="inputStatus">Update Project leader</label>
+                <label for="inputStatus">Update project leader</label>
                  {{ form.project_leader }}
+              </div>
+
+                 <div class="my-2">
+                            <label class="mt-2" style="color: #000;">Add more project files</label>
+
+                     <div id="msg_wrapper" class="alert alert-warning d-none" role="alert">
+                         <span id="msg"></span>
+                         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                     </div>
+                            <ul class="list-unstyled">
+                              {% for file in project.files.all %}
+                                <li class="btn-link text-secondary py-2" id="file_list_item{{file.id}}">
+
+                                      {% if file.extension == '.pdf' %}
+                                      <i class="far fa-fw fa-file-pdf"></i>
+                                      {% elif file.extension == '.docx' %}
+                                      <i class="far fa-fw fa-file-docx"></i>
+                                      {% elif file.extension == '.zip' %}
+                                      <i class="far fa-fw fa-file-archive"></i>
+                                      {% elif file.extension == '.jpg' %}
+                                      <i class="far fa-fw fa-file-image"></i>
+                                      {% elif file.extension == '.png' %}
+                                      <i class="far fa-fw fa-image"></i>
+                                      {% elif file.extension == '.txt' %}
+                                      <i class="far fa-fw fa-file-alt"></i>
+                                      {% endif %}
+                                      {{ file.filename }} <button onclick=deleteAttachmentFile({{file.id}}) class="btn btn-sm btn-danger">Remove</button>
+                                </li>
+                              {% empty %}
+                                <li>
+                                  <a href="" class="btn-link text-danger">No file added for this project !</a>
+                                </li>
+                              {% endfor %}
+                              </ul>
+                        </div>
+
+              <div class="form-group" id="file_div_wrapper">
+                    <label style="color: #000;">Add Project files</label>
+                    <div class="input-group">
+                      <div class="custom-file" id="file_input_container">
+                          <input type="file" class="form-control" name="file_name">
+                          <button id="add" class="btn btn-primary" type="button"> <i class="fas fa-plus"></i></button>
+                      </div>
+                    </div>
               </div>
 
               <div class="form-group">
@@ -64,15 +108,15 @@
               </div>
 
             </div>
-             <div class="mt-4 overflow-auto" style="min-width: 20%; height: 400px">
-               <label for="inputStatus" style="position: fixed; background: #fff; padding: 10px 80px; z-index: 100; text-align: left">Update crew</label>
-               <div style="margin-top: 60px">
+              <div class="mt-4 overflow-auto" style="min-width: 20%;">
+               <label style="background: #fff; display:block; width: 200px; height: 40px; z-index: 100; text-align: left; padding-left: 24px">Update crew</label>
+               <div style="margin-top: 60px width: 100%; height: 360px; overflow-y: auto">
                   <div class="form-group">
                       <div class="form-check">
                         {{ form.members }}
                       </div>
                   </div>
-             </div>
+               </div>
              </div>
             </div>
             <!-- /.card-body -->
@@ -83,6 +127,7 @@
       </div>
       <div class="row">
         <div class="col-12">
+          <button onClick="javascript:history.go(-1)" class="btn btn-primary text-white">Back</button>
           <input type="reset" value="Reset" class="btn btn-secondary">
           <input type="submit" value="Update" class="btn btn-success">
         </div>
@@ -91,4 +136,89 @@
     </section>
     <!-- /.content -->
   </div>
+{% endblock %}
+
+
+{% block js_block %}
+<script>
+    function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+          }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function deleteAttachmentFile(id) {
+        event.preventDefault()
+        var delete_msg = document.getElementById("delete_msg")
+        var delete_msg_wrapper = document.getElementById("delete_msg_wrapper")
+        var url = `https://shajjadpms.herokuapp.com/project-delete/${id}/`
+<!--        var url = `http://127.0.0.1:8000/project-file/delete/${id}/`-->
+       fetch(url, {
+        method: 'POST',
+       headers: {
+           'Content-type': 'application/json',
+          'X-CSRFToken': csrftoken
+        }
+        })
+       .then((response) => response.json())
+       .then((response) => {
+           document.getElementById(`file_list_item${id}`).remove()
+           msg_wrapper.classList.remove('alert', 'alert-warning', 'd-none')
+           msg_wrapper.classList.add('alert', 'alert-warning')
+           msg.innerHTML = response.success
+        })
+
+};
+
+
+
+
+
+
+    window.addEventListener("load", function() {
+    document.getElementById("add").addEventListener("click", function() {
+    var file_div_wrapper = document.getElementById("file_div_wrapper")
+
+    var inputGroup = document.createElement("div");
+                  inputGroup.setAttribute("class", "input-group");
+        file_div_wrapper.appendChild(inputGroup);
+
+    var customFile = document.createElement("div");
+              customFile.setAttribute("class", "custom-file my-2");
+
+    inputGroup.appendChild(customFile)
+
+
+    var file = document.createElement("input");
+    file.setAttribute("type", "file");
+    file.setAttribute("class", "form-control");
+    file.setAttribute("name", "file_name");
+
+    customFile.appendChild(file);
+    var minusBtn = document.createElement("button");
+                   minusBtn.setAttribute("class", "btn btn-danger");
+                   minusBtn.setAttribute("type", "button");
+                   customFile.appendChild(minusBtn)
+    var icon = document.createElement("i");
+               icon.setAttribute("class", "fas fa-minus");
+               minusBtn.appendChild(icon);
+
+    minusBtn.addEventListener('click', function() {
+    inputGroup.remove()
+    this.remove()
+});
+  });
+});
+</script>
 {% endblock %}

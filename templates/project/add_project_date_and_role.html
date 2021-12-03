@@ -80,7 +80,7 @@
 
                             <option value="{{ user.id }}">{{ user }}</option>
                         {% empty %}
-                          <option>User not fount !</option>
+                          <option>User not fount ! User didn't accept proposal for this project yet</option>
                         {% endfor %}
                         </select>
                       </div>
@@ -123,7 +123,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% for role in project.project_roles.all %}
+                            {% for role in project.roles.all %}
                             <tr>
                               <td class="py-2">{{ role.role_title }}</td>
                               <td class="py-2">{{ role.member }}</td>
@@ -131,7 +131,7 @@
                                {% if role.member %}
                                 ------------
                                {% else %}
-                                  <a class="btn btn-info btn-sm" title="Click to add project start and complete datetime" href="{% url 'dashboard:add-crew-in-role' title=role.role_title project_id=project.id role_id=role.id %}">
+                                  <a class="btn btn-info btn-sm" title="Click to add Crew" href="{% url 'dashboard:add-crew-in-role' title=role.role_title project_id=project.id role_id=role.id %}">
                                   <i class="fas fa-plus">
                                   </i>
                                   Crew
@@ -164,9 +164,9 @@
       </div>
       <div class="row">
         <div class="col-12">
-            <a href="{% url 'dashboard:projects-list' %}" class="btn btn-primary text-white">Back</a>
-          <input type="reset" value="Reset" class="btn btn-secondary">
-          <input type="submit" value="Create" class="btn btn-success">
+            <button onClick="javascript:history.go(-1)" class="btn btn-primary text-white">Back</button>
+            <input type="reset" value="Reset" class="btn btn-secondary">
+            <input type="submit" value="Create" class="btn btn-success">
         </div>
       </div>
       </form>

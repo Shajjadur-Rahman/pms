@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from datetime import datetime
 from django.template.defaultfilters import truncatechars
+import os
 
 
 class Project(models.Model):
@@ -12,7 +13,6 @@ class Project(models.Model):
     )
     members          = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='members', blank=True)
     created_by       = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True)
-    project_roles    = models.ManyToManyField('Role', blank=True, related_name='roles')
     title            = models.CharField(max_length=350)
     project_leader   = models.ForeignKey(settings.AUTH_USER_MODEL,  on_delete=models.SET_NULL, blank=True, null=True,
                                          related_name='project_leader')
@@ -21,7 +21,7 @@ class Project(models.Model):
     approve_by       = models.ForeignKey(settings.AUTH_USER_MODEL,
                                          on_delete=models.SET_NULL,
                                          related_name='projects_approved_by', null=True, blank=True)
-    public           = models.BooleanField(blank=True)
+    public           = models.BooleanField(False)
     public_shared    = models.DateTimeField(null=True, blank=True)
     created_at       = models.DateTimeField(auto_now_add=True)
     updated_at       = models.DateTimeField(auto_now=True)
@@ -30,8 +30,6 @@ class Project(models.Model):
 
     start_time       = models.DateTimeField(null=True, blank=True)
     end_time         = models.DateTimeField(null=True, blank=True)
-
-    attachments      = models.ManyToManyField('AttachmentFile', related_name='attachments', blank=True)
 
 
 
@@ -45,6 +43,7 @@ class Project(models.Model):
 
 
 class Role(models.Model):
+    project    = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='roles')
     member     = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True,
                                    related_name='member_roles')
     role_title = models.CharField(max_length=350)
@@ -60,11 +59,19 @@ class Role(models.Model):
 
 
 def upload_attachment(instance, filename):
-    return '/'.join(['file_name', str(instance.file_name), filename])
+    return '/'.join(['attach_file', str(instance.attach_file), filename])
 
 class AttachmentFile(models.Model):
+    project      = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='files')
     file_title   = models.CharField(max_length=250, null=True, blank=True)
     attach_file  = models.FileField(upload_to=upload_attachment, null=True, blank=True)
 
     def __str__(self):
         return str(self.pk)
+
+    def extension(self):
+        name, extension = os.path.splitext(self.attach_file.name)
+        return extension
+
+    def filename(self):
+        return os.path.basename(self.attach_file.name)

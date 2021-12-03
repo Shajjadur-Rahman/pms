@@ -160,7 +160,7 @@ class CreateMemberView(LoginRequiredMixin, AdminAndManagerPermission, generic.Vi
             form_obj.save()
             messages.success(self.request, 'New Member successfully created !')
             return HttpResponseRedirect(reverse('account:create-member'))
-        return render(request, 'manager_member_and_contact/create_user.html', context={'form': form, 'user_type': 'Member'})
+        return render(self.request, 'manager_member_and_contact/create_user.html', context={'form': form, 'user_type': 'Member'})
 
 
 
@@ -187,8 +187,14 @@ class ContactListView(LoginRequiredMixin, generic.View):
 
 class ContactAndMemberDetailView(LoginRequiredMixin, generic.View):
     def get(self, *args, **kwargs):
+        search_text = self.request.GET.get('search_text', '')
         user         = get_object_or_404(User, pk=self.kwargs['pk'])
         projects     = Project.objects.filter(members=self.kwargs['pk'], public=True)
+        if search_text:
+            projects = projects.filter(
+                Q(title__icontains=search_text) |
+                Q(description__icontains=search_text)
+            )
         ttl_projects = projects.count()
         local_tz     = get_current_timezone()
         paginator    = Paginator(projects, 2)

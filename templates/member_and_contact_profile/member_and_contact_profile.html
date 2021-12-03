@@ -122,7 +122,7 @@
                                         <p><span class="text-info">Project description </span> : {{ project.sliced_description }}</p>
                                         <a href="{% url 'dashboard:project-detail' pk=project.id %}" class="btn btn-sm btn-primary text-white" style="cursor: pointer"><i class="fas fa-folder"></i> View</a>
 
-                                        <button onclick=projectRequestConfirm({{project.id}}) id="request__btn{{project.id}}" class="btn btn-sm btn-{% if request.user in project.confirm_members.all %}success{% else %}warning{% endif %}"><i class="far fa-check-circle"></i>{% if request.user in project.confirm_members.all %}Confirmed{% else %}Pending{% endif %}</button>
+                                        <button onclick=projectRequestConfirm({{project.id}}) id="request__btn{{project.id}}" class="btn btn-sm btn-{% if request.user in project.confirm_members.all %}success{% else %}warning{% endif %}"><i class="far fa-check-circle pr-2"></i>{% if request.user in project.confirm_members.all %}Confirmed{% else %}Pending{% endif %}</button>
 
                                     </div>
                                     <div class="post__right pl-4 ml-4" style="width: 30%">
@@ -191,29 +191,28 @@
 {% block js_block %}
 <script>
 
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
             }
         }
+        return cookieValue;
     }
-    return cookieValue;
-}
-const csrftoken = getCookie('csrftoken');
+    const csrftoken = getCookie('csrftoken');
+
+
 
 function projectRequestConfirm(id) {
     var request__btn = document.getElementById(`request__btn${id}`)
-
-    console.log("response", id)
-    console.log("response", request__btn)
-        request__btn.style.color = "white";
+        var conIcon = document.createElement("i")
         var url = `https://shajjadpms.herokuapp.com/project-request-accept/${id}/`
 <!--        var url = `http://127.0.0.1:8000/project-request-accept/${id}/`-->
         fetch(url, {
@@ -225,18 +224,17 @@ function projectRequestConfirm(id) {
         })
         .then((response) => response.json())
         .then((response) => {
-
-            request__btn.innerHTML = response.approve_status
             request__btn.classList.remove('btn', 'btn-sm', 'btn-warning')
+            request__btn.innerHTML = '<i class="far fa-check-circle pr-2"></i>' + response.approve_status
+
+            request__btn.style.color = "white";
             request__btn.classList.add('btn', 'btn-sm', 'btn-success')
             msg_wrapper.classList.remove('alert', 'alert-warning', 'd-none')
             msg_wrapper.classList.add('alert', 'alert-warning')
             msg.innerHTML = response.approved_msg
-        })
+        });
 
 };
-
-
 
 </script>
 {% endblock %}

@@ -74,3 +74,5 @@ class ProjectUpdateForm(forms.ModelForm):
     class Meta:
         model  = Project
         fields = ['members', 'title', 'project_leader', 'description', 'public']
+
+

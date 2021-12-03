@@ -336,10 +336,9 @@
 
 	{% endblock %}
 	<footer class="main-footer">
-		<strong>Copyright &copy; 2014-2019 <a href="http://adminlte.io">AdminLTE.io</a>.</strong>
-		All rights reserved.
+		<strong>Copyright &copy;  <span id="year"></span> </strong>
 		<div class="float-right d-none d-sm-inline-block">
-			<b>Version</b> 3.0.2
+			<b>Version</b> 1.0
 		</div>
 	</footer>
 
@@ -399,6 +398,10 @@
 <script src="{% static 'dashboard/js/demo.js' %}"></script>
 
 {% block js_block %}
+ <script>
+	 document.getElementById("year").innerHTML = new Date().getFullYear();
+ </script>
+
 
 {% endblock %}
 

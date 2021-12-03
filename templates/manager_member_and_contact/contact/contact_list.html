@@ -73,6 +73,7 @@
         </div>
         <!-- /.card-body -->
         <div class="card-footer">
+          {% if contacts %}
           <nav aria-label="Contacts Page Navigation">
             <ul class="pagination rounded-separated pagination-danger">
                 {% if contacts.has_previous %}
@@ -90,6 +91,8 @@
                 {% endif %}
             </ul>
           </nav>
+          {% endif %}
+
         </div>
         <!-- /.card-footer -->
       </div>
